@@ -1,9 +1,6 @@
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 
-// @todo: use babel
-// @todo: use cache for awesome typescript loader
-
 const { root } = require('./helpers');
 
 module.exports = (options) => {
@@ -24,8 +21,11 @@ module.exports = (options) => {
       rules: [
         {
           test: /\.(ts|js)$/,
-          use: 'awesome-typescript-loader',
+          loader: 'awesome-typescript-loader',
           exclude: /node_modules/,
+          options: {
+            useCache: true,
+          },
         },
       ]
     },
