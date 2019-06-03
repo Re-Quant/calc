@@ -7,7 +7,7 @@ module.exports = (options) => {
   const isProd = options.env === 'production';
 
   return {
-    mode: isProd ? 'production' : 'development',
+    mode:    isProd ? 'production' : 'development',
     devtool: isProd ? 'source-map' : 'eval-source-map',
     entry: root('src/index.ts'),
     target: 'node',
@@ -20,17 +20,33 @@ module.exports = (options) => {
     module: {
       rules: [
         {
-          test: /\.(ts|js)$/,
+          test: /\.ts$/,
           loader: 'awesome-typescript-loader',
           exclude: /node_modules/,
-          options: {
-            useCache: true,
-          },
+          // options: {
+          //   useCache: true,
+          // },
         },
       ]
     },
+
+    /**
+     * Options affecting the resolving of modules.
+     *
+     * See: https://webpack.js.org/configuration/resolve/
+     */
     resolve: {
-      extensions: ['.ts', '.json'],
+      /**
+       * An array of extensions that should be used to resolve modules.
+       *
+       * See: https://webpack.js.org/configuration/resolve/#resolve-extensions
+       */
+      extensions: ['.ts', '.js', '.json'],
+
+      /**
+       * Make sure root is src
+       */
+      modules: [root('src'), root('node_modules')],
     },
 
     /**
