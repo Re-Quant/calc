@@ -1,9 +1,10 @@
 {
   "name": "@z-brain/calc",
+  "description": "...",
   "version": "0.0.1",
   "repository": "git@github.com:z-brain/calc.git",
   "author": "Anton Korniychuk <dev@korniychuk.pro>",
-  "license": "GNUv3",
+  "license": "GPL-3.0",
   "main": "index.js",
   "types": "index.d.ts",
   "private": false,
