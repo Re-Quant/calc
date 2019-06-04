@@ -39,6 +39,12 @@ module.exports = function (w) {
       params: { runner: '--web-security=false --headless' }
     },
 
+    compilers: {
+      '**/*.ts': w.compilers.typeScript({
+        typescript: require('typescript'),
+      }),
+    },
+
 
     setup: function () {
       window.__moduleBundler.loadTests();
