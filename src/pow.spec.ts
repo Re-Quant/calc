@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { pow } from './pow';
 
 describe('pow', () => {

@@ -186,3 +186,4 @@ fabric.properties
 ### Project
 /dist
 /.awcache
+/package-lock.json

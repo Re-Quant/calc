@@ -1,3 +1,5 @@
+declare const expect: Chai.ExpectStatic;
+
 declare const ENV: 'production' | 'development' | 'test';
 declare const IS_ENV_PROD: boolean;
 declare const IS_ENV_TEST: boolean;

@@ -1,7 +1,7 @@
-const { CheckerPlugin } = require('awesome-typescript-loader');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
+const { CheckerPlugin } = require('awesome-typescript-loader');
 
-const { root } = require('./helpers');
+const { root } = require('../helpers');
 
 module.exports = (options) => {
   const isProd = options.env === 'production';
@@ -9,8 +9,8 @@ module.exports = (options) => {
   return {
     mode:    isProd ? 'production' : 'development',
     devtool: isProd ? 'source-map' : 'eval-source-map',
+
     entry: root('src/index.ts'),
-    target: 'node',
 
     output: {
       filename: 'index.js',
@@ -23,9 +23,9 @@ module.exports = (options) => {
           test: /\.ts$/,
           loader: 'awesome-typescript-loader',
           exclude: /node_modules/,
-          // options: {
-          //   useCache: true,
-          // },
+          options: {
+            useCache: true,
+          },
         },
       ]
     },
@@ -74,5 +74,7 @@ module.exports = (options) => {
 
       new CheckerPlugin(),
     ],
+
+    target: 'node',
   };
 };

@@ -24,7 +24,8 @@
     "types": [
       "node",
       "webpack",
-      "mocha"
+      "mocha",
+      "chai"
     ]
   },
   "exclude": [
