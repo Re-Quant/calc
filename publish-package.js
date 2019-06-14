@@ -13,17 +13,18 @@ const { env, isProd, isDev } = getEnv();
 const allVersions = getAllVersions();
 const { currentBaseVersion, nextBaseVersion } = getBaseVersions();
 const variations = allVersions.filter(({ base }) => base === currentBaseVersion);
-const isBaseVersionPublished = variations.some(v => v.base === currentBaseVersion);
+const isBaseVersionPublished = variations.some(v => !v.tag && !v.tagVersion);
 
-const findNextByTag = (tag) => allVersions.filter(({ base }) => base === nextBaseVersion)
-                                          .filter(v => v.tag === tag)
-                                          .map(v => +v.tagVersion)
-                                          .concat(-1)
-                                          .reduce((a, b) => Math.max(a, b)) + 1;
+const findNextByTag = (tag, useNextBaseVersion = true) => allVersions
+  .filter(({ base }) => base === (useNextBaseVersion ? nextBaseVersion : currentBaseVersion))
+  .filter(v => v.tag === tag)
+  .map(v => +v.tagVersion)
+  .concat(-1)
+  .reduce((a, b) => Math.max(a, b)) + 1;
 
 if (isProd) {
-  const nextRcTag  = findNextByTag('rc');
   if (isBaseVersionPublished) {
+    const nextRcTag = findNextByTag('rc');
     const version = makeVersion(nextBaseVersion, 'rc', nextRcTag);
     saveNewVersionToDist(version);
     publish('rc');
@@ -31,8 +32,12 @@ if (isProd) {
     publish();
   }
 } else if (isDev) {
-  const nextDevTag = findNextByTag('dev');
-  const version = makeVersion(nextBaseVersion, 'dev', nextDevTag);
+  const nextDevTag = findNextByTag('dev', isBaseVersionPublished);
+  const version = makeVersion(
+    isBaseVersionPublished ? nextBaseVersion : currentBaseVersion,
+    'dev',
+    nextDevTag,
+  );
   saveNewVersionToDist(version);
   publish('dev');
 } else {
