@@ -17,7 +17,9 @@
     "test": "npm run _test -- --watch",
     "test:ci": "npm run _test",
     "webpack": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
-    "npm:publish": "npm publish dist --access public"
+    "npm:publish": "npm publish dist --access public",
+    "npm:version": "echo $npm_package_version",
+    "npm:prepare-version": "if [[ \"$(npm run npm:version --silent)\" == \"npm view . version\" ]]; then npm version patch; fi"
   },
   "devDependencies": {
     "@types/chai": "~4.1.7",
