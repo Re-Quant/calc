@@ -18,7 +18,7 @@
     "test:watch": "npm run test -- --watch",
     "npm:publish": "npm publish dist --access public",
     "npm:version": "echo $npm_package_version",
-    "npm:version:update_": "npm version $VERSION_PART_NAME -m 'new $VERSION_PART_NAME package version: %s' && git push --no-verify && git push --no-verify --tags",
+    "npm:version:update_": "npm version $VERSION_PART_NAME -m \"new $VERSION_PART_NAME package version: %s\" && git push --no-verify && git push --no-verify --tags",
     "npm:version:update-major": "VERSION_PART_NAME=major npm run npm:version:update_",
     "npm:version:update-minor": "VERSION_PART_NAME=minor npm run npm:version:update_",
     "npm:version:update-patch": "VERSION_PART_NAME=patch npm run npm:version:update_"
