@@ -1,7 +1,7 @@
 {
   "name": "@z-brain/calc",
   "description": "...",
-  "version": "0.0.8-0",
+  "version": "0.0.8",
   "repository": "git@github.com:z-brain/calc.git",
   "author": "Anton Korniychuk <dev@korniychuk.pro>",
   "license": "GPL-3.0",
@@ -12,13 +12,10 @@
     "webpack_": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
     "build:dev": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
     "build:prod": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.prod.js --progress --profile --bail",
-
     "lint": "tslint \"src/**/*.ts\" --project tsconfig.json",
     "lint:fix": "npm run lint -- --fix",
-
     "test": "mochapack --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
     "test:watch": "npm run test -- --watch",
-
     "npm:publish": "npm publish dist --access public",
     "npm:version": "echo $npm_package_version",
     "npm:version:update_": "npm version $VERSION_PART_NAME -m 'new $VERSION_PART_NAME package version: %s' && git push --no-verify && git push --no-verify --tags",
