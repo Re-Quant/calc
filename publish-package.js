@@ -29,6 +29,12 @@ if (isProd) {
     saveNewVersionToDist(version);
     publish('rc');
   } else {
+    const distPackageJsonPath = root('dist', 'package.json');
+    if (fs.existsSync(distPackageJsonPath) && require(distPackageJsonPath).version !== currentBaseVersion) {
+      // in the most cases the version is the same, however after deployment in 'dev' mode the version
+      // changed until creating new build and should be overwrote for the 'prod' build mode
+      saveNewVersionToDist(currentBaseVersion);
+    }
     publish();
   }
 } else if (isDev) {
