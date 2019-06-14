@@ -9,17 +9,22 @@
   "types": "index.d.ts",
   "private": false,
   "scripts": {
-    "build:dev": "rimraf dist && npm run webpack -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
-    "build:prod": "rimraf dist && npm run webpack -- --config config/webpack/webpack.prod.js --progress --profile --bail",
+    "webpack_": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
+    "build:dev": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
+    "build:prod": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.prod.js --progress --profile --bail",
+
     "lint": "tslint \"src/**/*.ts\" --project tsconfig.json",
     "lint:fix": "npm run lint -- --fix",
-    "_test": "mochapack --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
-    "test": "npm run _test -- --watch",
-    "test:ci": "npm run _test",
-    "webpack": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
+
+    "test": "mochapack --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
+    "test:watch": "npm run test -- --watch",
+
     "npm:publish": "npm publish dist --access public",
     "npm:version": "echo $npm_package_version",
-    "npm:prepare-version": "if [[ \"$(npm run npm:version --silent)\" == \"npm view . version\" ]]; then npm version patch; fi"
+    "npm:version:update_": "npm version $VERSION_PART_NAME -m 'new $VERSION_PART_NAME package version: %s' && git push --no-verify && git push --no-verify --tags",
+    "npm:version:update-major": "VERSION_PART_NAME=major && npm run npm:version:update_",
+    "npm:version:update-minor": "VERSION_PART_NAME=minor && npm run npm:version:update_",
+    "npm:version:update-patch": "VERSION_PART_NAME=patch && npm run npm:version:update_"
   },
   "devDependencies": {
     "@types/chai": "~4.1.7",
