@@ -2,26 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+checkMajorNodeVersion();
+
 const availableNpmTags = new Set(['latest', 'rc', 'dev']);
 const verRegEx = /^(?<base>\d+\.\d+\.\d+)(?:$|-(?<tag>\w+)\.(?<tagVersion>\d+)$)/;
 
-const root = path.join.bind(path, __dirname, '..');
+const root = path.join.bind(path, __dirname);
 const { env, isProd, isDev } = getEnv();
 
 const allVersions = getAllVersions();
-const currentBaseVersion = getCurrentBaseVersion();
+const { currentBaseVersion, nextBaseVersion } = getBaseVersions();
 const variations = allVersions.filter(({ base }) => base === currentBaseVersion);
 const isBaseVersionPublished = variations.some(v => v.base === currentBaseVersion);
 
-const findNextByTag = (tag) => variations.filter(v => v.tag === tag)
-                              .map(v => +v.tagVersion)
-                              .concat(-1)
-                              .reduce((a, b) => Math.max(a, b)) + 1;
+const findNextByTag = (tag) => allVersions.filter(({ base }) => base === nextBaseVersion)
+                                          .filter(v => v.tag === tag)
+                                          .map(v => +v.tagVersion)
+                                          .concat(-1)
+                                          .reduce((a, b) => Math.max(a, b)) + 1;
 
 if (isProd) {
   const nextRcTag  = findNextByTag('rc');
   if (isBaseVersionPublished) {
-    const version = makeVersion(currentBaseVersion, 'rc', nextRcTag);
+    const version = makeVersion(nextBaseVersion, 'rc', nextRcTag);
     saveNewVersionToDist(version);
     publish('rc');
   } else {
@@ -29,12 +32,16 @@ if (isProd) {
   }
 } else if (isDev) {
   const nextDevTag = findNextByTag('dev');
-  const version = makeVersion(currentBaseVersion, 'dev', nextDevTag);
+  const version = makeVersion(nextBaseVersion, 'dev', nextDevTag);
   saveNewVersionToDist(version);
   publish('dev');
 } else {
   throw new Error(`Unsupported environment: '${env}'`);
 }
+
+//
+// functions
+//
 
 function makeVersion(base, tag, tagVersion) {
   return `${base}-${tag}.${tagVersion}`;
@@ -52,7 +59,6 @@ function getEnv() {
 
     case 'dev':
     case 'development':
-    case 'test':
       env = 'development';
       break;
 
@@ -71,7 +77,7 @@ function publish(npmTag = 'latest') {
     throw new Error(`Wrong npm tag: ${npmTag}`);
   }
 
-  execSync(`npm run npm:publish -- --tag ${npmTag}`);
+  execSync(`npm publish dist --access public --tag ${npmTag}`);
 }
 
 function saveNewVersionToDist(version) {
@@ -92,7 +98,7 @@ function getAllVersions() {
     .map(({ base, tag, tagVersion }) => ({ base, tag, tagVersion }));
 }
 
-function getCurrentBaseVersion() {
+function getBaseVersions() {
   const packageJson = require(root('package.json'));
   const currentVersion = packageJson.version;
   const info = currentVersion && String(currentVersion).match(verRegEx);
@@ -106,5 +112,15 @@ function getCurrentBaseVersion() {
     throw new Error(`Current version (${base}) should not have tag and tag version: ${tag}.${tagVersion}`);
   }
 
-  return base;
+  const next = base.replace(/^(\d+)\.(\d+)\.(\d+)$/, (all, major, minor, patch) => `${major}.${minor}.${+patch + 1}`);
+
+  return { currentBaseVersion: base, nextBaseVersion: next };
+}
+
+function checkMajorNodeVersion(expected) {
+  const actual = +process.version.replace(/^v(\d+)\..*$/, '$1');
+
+  if (expected < actual) {
+    throw new Error(`Minimal node version is ${expected}, actual version is ${actual}`);
+  }
 }
