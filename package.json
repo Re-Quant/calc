@@ -9,14 +9,15 @@
   "types": "index.d.ts",
   "private": false,
   "scripts": {
-    "build:dev":  "rimraf dist && yarn run webpack -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
-    "build:prod": "rimraf dist && yarn run webpack -- --config config/webpack/webpack.prod.js --progress --profile --bail",
-    "lint":       "tslint \"src/**/*.ts\" --project tsconfig.json",
-    "lint:fix":   "yarn run lint -- --fix",
-    "_test":      "mochapack --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
-    "test":       "yarn run _test -- --watch",
-    "test:ci":    "yarn run _test",
-    "webpack":    "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js"
+    "build:dev":   "rimraf dist && npm run webpack -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
+    "build:prod":  "rimraf dist && npm run webpack -- --config config/webpack/webpack.prod.js --progress --profile --bail",
+    "lint":        "tslint \"src/**/*.ts\" --project tsconfig.json",
+    "lint:fix":    "npm run lint -- --fix",
+    "_test":       "mochapack --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
+    "test":        "npm run _test -- --watch",
+    "test:ci":     "npm run _test",
+    "webpack":     "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
+    "npm:publish": "npm publish dist --access public"
   },
   "devDependencies": {
     "@types/chai":               "~4.1.7",
