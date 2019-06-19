@@ -54,7 +54,7 @@ describe('ZMath', () => {
       const expectedSum = payload.reduce((a, b) => a + b);
 
       // act
-      const sum = zMath.sigmaSum(payload, (v, i) => payload[i]);
+      const sum = zMath.sigmaSum(payload, i => payload[i]);
 
       // assert
       expect(sum).to.eq(expectedSum);
@@ -66,7 +66,7 @@ describe('ZMath', () => {
       const expectedSum = payload.reduce((a, b, i) => a + b + i * 1000);
 
       // act
-      const sum = zMath.sigmaSum(payload, (v, i) => v + i * 1000);
+      const sum = zMath.sigmaSum(payload, (i, v) => v + i * 1000);
 
       // assert
       expect(sum).to.eq(expectedSum);
