@@ -32,9 +32,11 @@
     ],
     "variable-name": [
       true,
+      "require-const-for-all-caps",
       "allow-leading-underscore",
       "ban-keywords",
-      "check-format"
+      "check-format",
+      "allow-pascal-case"
     ],
     "no-increment-decrement": false
   }
