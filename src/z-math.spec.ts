@@ -11,15 +11,15 @@ describe('ZMath', () => {
   describe('sum()', () => {
     it('should throw TypeError on wrong arguments', () => {
       // @ts-ignore
-      expect(() => zMath.sum(0)).to.throw(TypeError);
+      expect(() => zMath.sigmaSum(0)).to.throw(TypeError);
       // @ts-ignore
-      expect(() => zMath.sum(() => 0)).to.throw(TypeError);
+      expect(() => zMath.sigmaSum(() => 0)).to.throw(TypeError);
       // @ts-ignore
-      expect(() => zMath.sum(1, 1, 1, () => 0)).to.throw(TypeError);
+      expect(() => zMath.sigmaSum(1, 1, 1, () => 0)).to.throw(TypeError);
       // @ts-ignore
-      expect(() => zMath.sum(1, [1], () => 0)).to.throw(TypeError);
+      expect(() => zMath.sigmaSum(1, [1], () => 0)).to.throw(TypeError);
       // @ts-ignore
-      expect(() => zMath.sum([1], 1, () => 0)).to.throw(TypeError);
+      expect(() => zMath.sigmaSum([1], 1, () => 0)).to.throw(TypeError);
     });
 
     it('should calculate sum with "from" & "to"', () => {
@@ -30,7 +30,7 @@ describe('ZMath', () => {
                         + 13 * 100;
 
       // act
-      const sum = zMath.sum(10, 13, i => i * 100);
+      const sum = zMath.sigmaSum(10, 13, i => i * 100);
 
       // assert
       expect(sum).to.eq(expectedSum);
@@ -42,7 +42,7 @@ describe('ZMath', () => {
       const expectedSum = payload.reduce((a, b) => a + b);
 
       // act
-      const sum = zMath.sum(payload.length - 1, i => payload[i]);
+      const sum = zMath.sigmaSum(payload.length - 1, i => payload[i]);
 
       // assert
       expect(sum).to.eq(expectedSum);
@@ -54,7 +54,7 @@ describe('ZMath', () => {
       const expectedSum = payload.reduce((a, b) => a + b);
 
       // act
-      const sum = zMath.sum(payload, (v, i) => payload[i]);
+      const sum = zMath.sigmaSum(payload, (v, i) => payload[i]);
 
       // assert
       expect(sum).to.eq(expectedSum);
@@ -66,7 +66,7 @@ describe('ZMath', () => {
       const expectedSum = payload.reduce((a, b, i) => a + b + i * 1000);
 
       // act
-      const sum = zMath.sum(payload, (v, i) => v + i * 1000);
+      const sum = zMath.sigmaSum(payload, (v, i) => v + i * 1000);
 
       // assert
       expect(sum).to.eq(expectedSum);
@@ -129,5 +129,17 @@ describe('ZMath', () => {
     expect(zMath.eq(res2, 10.123)).to.be.true;
     expect(zMath.eq(res3, 10.123)).to.be.true;
     expect(zMath.eq(res4, 10.123)).to.be.true;
+  });
+
+  it('sum() should calculate the sum of the numbers array', () => {
+    // arrange
+    const source = [1, 2, 3, 4, 5];
+    const expected = 1 + 2 + 3 + 4 + 5;
+
+    // act
+    const sum = zMath.sum(source);
+
+    // assert
+    expect(sum).to.equal(expected);
   });
 });

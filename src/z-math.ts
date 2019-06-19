@@ -3,19 +3,19 @@ export class ZMath {
   /**
    * Sigma Summary
    */
-  public sum<T>(payload: T[], cb: (value: T, i: number) => number): number;
+  public sigmaSum<T>(payload: T[], cb: (value: T, i: number) => number): number;
   /**
    * Sigma Summary
    */
-  public sum<T>(to: number, cb: (i: number) => number): number;
+  public sigmaSum<T>(to: number, cb: (i: number) => number): number;
   /**
    * Sigma Summary
    */
-  public sum<T>(from: number, to: number, cb: (i: number) => number): number;
+  public sigmaSum<T>(from: number, to: number, cb: (i: number) => number): number;
   /**
    * Sigma Summary
    */
-  public sum(...args: any[]): number {
+  public sigmaSum(...args: any[]): number {
     let payload: any[] | undefined;
     let from = 0;
     let to: number;
@@ -72,6 +72,10 @@ export class ZMath {
 
   public eq(n1: number, n2: number): boolean {
     return Math.abs(n1 - n2) < Number.EPSILON;
+  }
+
+  public sum(arr: number[]): number {
+    return arr.reduce((a, b) => a + b);
   }
 
 }
