@@ -70,8 +70,8 @@ workflows:
       - deploy-authenticate:
           requires:
             - test
-            branches:
-              only: /(master|develop)/
+          branches:
+            only: /(master|develop)/
       - deploy-dev:
           requires:
             - test
