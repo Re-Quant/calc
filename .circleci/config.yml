@@ -46,6 +46,9 @@ jobs:
       - run:
           name: Build package
           command: npm run build:prod
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
 
   deploy-dev:
     <<: *defaults
