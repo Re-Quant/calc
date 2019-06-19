@@ -67,6 +67,11 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+      - deploy-authenticate:
+          requires:
+            - test
+            branches:
+              only: /(master|develop)/
       - deploy-dev:
           requires:
             - test
