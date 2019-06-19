@@ -25,6 +25,9 @@ jobs:
       - run:
           name: Run tests
           command: npm test
+      - run:
+          name: Run lint
+          command: npm run lint
 
       - save_cache:
           paths:
@@ -34,28 +37,33 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
+
+  build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Build package
+          command: npm run build:prod
+
   deploy-dev:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/repo
       - run:
-          name: Build package
-          command: npm run build:prod
-      - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
       - run:
           name: Publish package
           command: npm run publish:dev
+
   deploy-prod:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/repo
-      - run:
-          name: Build package
-          command: npm run build:prod
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
@@ -71,15 +79,23 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only: /(master|develop)/
       - deploy-dev:
           requires:
             - test
+            - build
           filters:
             branches:
               only: /develop/
       - deploy-prod:
           requires:
             - test
+            - build
           filters:
 #            tags:
 #              only: /^v.*/
