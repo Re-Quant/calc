@@ -1,4 +1,4 @@
-import { zMath as zMathInstance, ZMath } from './z-math';
+import { zMath, ZMath } from './z-math';
 
 interface TradeSumOrder {
   /** Price for the order execution */
@@ -9,7 +9,17 @@ interface TradeSumOrder {
   f: number;
 }
 
-export interface TradeSumArgs {
+// function validateOrderPartPercentages(entries: TradeSumOrder[], stops: TradeSumOrder[]) {
+//   if (!zMath.eq(zMath.sumBy(entries, 'i'), 1)
+//     || !zMath.eq(zMath.sumBy(stops, 'i'), 1)
+//   ) {
+//     /* tslint:disable-next-line:max-line-length */
+//     throw new Error(
+//     'Percentage sum of all parts for order in "entries" and "stops" arrays should be equal "1"');
+//   }
+// }
+
+export interface TradeInfoArgs {
   /** Whole Deposit */
   d: number;
   /** Maximum risk for the trade (percent 0..1) */
@@ -24,21 +34,21 @@ export interface TradeSumArgs {
 export class ZRisk {
 
   public constructor(
-    private zMath: ZMath,
+    private math: ZMath,
   ) {}
 
   /**
-   * @return trade sum in quoted units
+   * @return summary volume of the trade in quoted units
    * @todo: test
    */
-  public tradeSumQ({ d, r, entries, stops }: TradeSumArgs): number {
+  public tradeVolumeQuoted({ d, r, entries, stops }: TradeInfoArgs): number {
     const vRisk = d * r;
 
-    const x = this.zMath.sigmaSum(entries, v => v.i * v.f);
-    const y = this.zMath.sigmaSum(entries, v => v.i / v.p)
+    const x = this.math.sumBy(entries, v => v.i * v.f);
+    const y = this.math.sumBy(entries, v => v.i / v.p)
       * (
-          this.zMath.sigmaSum(stops, v => v.i * v.p)
-        + this.zMath.sigmaSum(stops, v => v.i * v.f)
+          this.math.sumBy(stops, v => v.i * v.p)
+        + this.math.sumBy(stops, v => v.i * v.f)
       );
 
     return vRisk / (1 - x - y); // vSumQOriginal
@@ -46,20 +56,70 @@ export class ZRisk {
 
   /**
    * Distribute whole sum(sum of many or something else) for multiple parts
-   * @todo: test & description
    *
    * @param sum
-   * @param percentages
+   * @param percentages 0..1
    */
   public distribute(sum: number, percentages: number[]): number[] {
-    const percentagesSum = this.zMath.sum(percentages);
-    if (!this.zMath.eq(percentagesSum, 1)) {
-      throw new RangeError(`ZRisk.sum() The sum of percentages always should be equal 1`);
+    return percentages.map(percent => sum * percent);
+  }
+
+  public getTradeInfo(args: TradeInfoArgs) {
+    const Pe = args.entries.map(o => o.p);
+    const Ie = args.entries.map(o => o.i);
+    const Fe = args.entries.map(o => o.f);
+    const Ps = args.stops.map(o => o.p);
+    const Is = args.stops.map(o => o.i);
+    const Fs = args.stops.map(o => o.f);
+
+    const vSumQOriginal = this.tradeVolumeQuoted(args);
+    const Ve = args.entries.map(o => vSumQOriginal * o.i);
+    const vSumBOriginal = this.math.sigmaSum(Ve, i => Ve[i] / Pe[i]);
+
+  }
+
+  public unzip<T extends object>(objects: T[]): { [key in keyof T]?: number[] } {
+    const res: { [key in keyof T]?: number[] } = {};
+    if (!objects.length) { return res; }
+
+    const keys = Object.keys(objects[0]);
+    for (let i = 0; i < objects.length; i++) {
+      for (let j = 0; j < keys.length; j++) {
+        const key: keyof T = keys[j] as any;
+        if (!res[key]) {
+          res[key] = [];
+        }
+        // @ts-ignore
+        res[key][i] = objects[i][key];
+      }
     }
 
-    return percentages.map(v => sum * v);
+    return res;
+  }
+
+  // @todo: try to rewrite with .forEach
+  public zip<T extends {[key: string]: number[]}>(map: { [key in keyof T]: number[] }): T[] {
+    const res: T[] = [];
+
+    const keys = Object.keys(map);
+    if (!keys.length) { return res; }
+
+    const len = (map[keys[0] as keyof T]).length;
+    if (!len) { return res; }
+
+    for (let i = 0; i < len; i++) {
+      const item: T = {} as any;
+      for (let j = 0; j < keys.length; j++) {
+        const key: keyof T = keys[j] as any;
+        // @ts-ignore
+        item[key] = map[key][i];
+      }
+      res.push(item);
+    }
+
+    return res;
   }
 
 }
 
-export const zRisk = new ZRisk(zMathInstance);
+export const zRisk = new ZRisk(zMath);

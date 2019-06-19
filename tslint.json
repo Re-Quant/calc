@@ -38,6 +38,8 @@
       "check-format",
       "allow-pascal-case"
     ],
-    "no-increment-decrement": false
+    "no-increment-decrement": false,
+    "prefer-for-of": false,
+    "array-type": false
   }
 }
