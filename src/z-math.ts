@@ -70,12 +70,25 @@ export class ZMath {
     return Math.floor(value * multiplier) / multiplier;
   }
 
+  /** Comparing float numbers */
   public eq(n1: number, n2: number): boolean {
     return Math.abs(n1 - n2) < Number.EPSILON;
   }
 
   public sum(arr: number[]): number {
     return arr.reduce((a, b) => a + b);
+  }
+
+  /**
+   * @param arr    array of objects
+   * @param picker callback or field name
+   */
+  public sumBy<T>(arr: T[], picker: keyof T | ((v: T, i: number) => number)): number {
+    if (typeof picker === 'function') {
+      return arr.reduce((sum: number, curr: T, i: number) => sum + picker(curr as T, i), 0);
+    }
+
+    return arr.reduce((sum: number, curr) => sum + +curr[picker], 0);
   }
 
 }

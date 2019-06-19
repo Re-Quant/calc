@@ -142,4 +142,32 @@ describe('ZMath', () => {
     // assert
     expect(sum).to.equal(expected);
   });
+
+  describe('subBy()', () => {
+
+    it('should calculate sum with field name as picker', () => {
+      // arrange
+      const data = [{ a: 1, b: 10 }, { a: 2, b: 20 }, { a: 3, b: 30 }];
+      const expected = data[0].a + data[1].a + data[2].a;
+
+      // act
+      const sum = zMath.sumBy(data, 'a');
+
+      // assert
+      expect(sum).to.be.eq(expected);
+    });
+
+    it('should calculate sum with callback as picker', () => {
+      // arrange
+      const data = [{ a: 1, b: 10 }, { a: 2, b: 20 }, { a: 3, b: 30 }];
+      const expected = data[0].a + data[1].a + data[2].a;
+
+      // act
+      const sum = zMath.sumBy(data, v => v.a);
+
+      // assert
+      expect(sum).to.be.eq(expected);
+    });
+  });
+
 });
