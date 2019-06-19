@@ -1,6 +1,7 @@
 {
   "extends": [
-    "tslint:recommended"
+    "tslint:recommended",
+    "tslint-config-airbnb"
   ],
   "rules": {
     "interface-name": false,
@@ -34,6 +35,7 @@
       "allow-leading-underscore",
       "ban-keywords",
       "check-format"
-    ]
+    ],
+    "no-increment-decrement": false
   }
 }
