@@ -55,6 +55,25 @@ export class ZMath {
     return sum;
   }
 
+  public round(value: number, precision: number): number {
+    const multiplier = 10 ** precision;
+    return Math.round(value * multiplier) / multiplier;
+  }
+
+  public ceil(value: number, precision: number): number {
+    const multiplier = 10 ** precision;
+    return Math.ceil(value * multiplier) / multiplier;
+  }
+
+  public floor(value: number, precision: number): number {
+    const multiplier = 10 ** precision;
+    return Math.floor(value * multiplier) / multiplier;
+  }
+
+  public eq(n1: number, n2: number): boolean {
+    return Math.abs(n1 - n2) < Number.EPSILON;
+  }
+
 }
 
 export const zMath = new ZMath();
