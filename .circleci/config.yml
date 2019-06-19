@@ -75,7 +75,7 @@ workflows:
           requires:
             - test
           filters:
-            tags:
-              only: /^v.*/
+#            tags:
+#              only: /^v.*/
             branches:
               only: /master/
