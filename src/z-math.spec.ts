@@ -131,19 +131,25 @@ describe('ZMath', () => {
     expect(zMath.eq(res4, 10.123)).to.be.true;
   });
 
-  it('sum() should calculate the sum of the numbers array', () => {
-    // arrange
-    const source = [1, 2, 3, 4, 5];
-    const expected = 1 + 2 + 3 + 4 + 5;
+  describe('sum()', () => {
+    it('should calculate the sum of the numbers array', () => {
+      // arrange
+      const source = [1, 2, 3, 4, 5];
+      const expected = 1 + 2 + 3 + 4 + 5;
 
-    // act
-    const sum = zMath.sum(source);
+      // act
+      const sum = zMath.sum(source);
 
-    // assert
-    expect(sum).to.equal(expected);
+      // assert
+      expect(sum).to.equal(expected);
+    });
+
+    it('should return 0 for empty array', () => {
+      expect(zMath.sum([])).to.be.eq(0);
+    });
   });
 
-  describe('subBy()', () => {
+  describe('sumBy()', () => {
 
     it('should calculate sum with field name as picker', () => {
       // arrange

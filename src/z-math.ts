@@ -76,7 +76,7 @@ export class ZMath {
   }
 
   public sum(arr: number[]): number {
-    return arr.reduce((a, b) => a + b);
+    return arr.reduce((sum, b) => sum + b, 0);
   }
 
   /**
