@@ -2,39 +2,32 @@ import { zMath, ZMath } from './z-math';
 
 interface TradeOrderArg {
   /** Price for the order execution */
-  p: number;
-  /** Part of whole money sum for this trade (percent 0..1) */
-  i: number;
-  /** Fee for the order (percent 0..1) */
-  f: number;
+  price: number;
+  /** Part of total volume for this trade (percent 0..1) */
+  volumePart: number;
+  /**
+   * Fee for the order (percent 0..1)
+   * Notice: absolute fee doesn't support now
+   */
+  fee: number;
 }
 
 interface TradeOrder extends TradeOrderArg {
   /** Volume for the order in Quoted units */
-  vq: number;
+  volumeQuoted: number;
   /** Volume for the order in Base units */
-  vb: number;
+  volumeBase: number;
   /** Fee Volume for the order in Quoted units */
-  fvq: number;
+  feeVolumeQuoted: number;
   /** Fee Volume for the order in Base units */
-  fvb: number;
+  feeVolumeBase: number;
 }
-
-// function validateOrderPartPercentages(entries: TradeSumOrder[], stops: TradeSumOrder[]) {
-//   if (!zMath.eq(zMath.sumBy(entries, 'i'), 1)
-//     || !zMath.eq(zMath.sumBy(stops, 'i'), 1)
-//   ) {
-//     /* tslint:disable-next-line:max-line-length */
-//     throw new Error(
-//     'Percentage sum of all parts for order in "entries" and "stops" arrays should be equal "1"');
-//   }
-// }
 
 export interface TradeInfoArgs<T = TradeOrderArg> {
   /** Whole Deposit */
-  d: number;
+  deposit: number;
   /** Maximum risk for the trade (percent 0..1) */
-  r: number;
+  risk: number;
 
   /** Entry Orders - Orders for get a position */
   entries: T[];
@@ -42,16 +35,21 @@ export interface TradeInfoArgs<T = TradeOrderArg> {
   stops: T[];
 }
 
-interface TradeInfo extends TradeInfoArgs<TradeOrder> {
+interface FullTradeInfoArgs<T = TradeOrderArg> extends TradeInfoArgs<T> {
+  /** Take-Profit Orders - Distribute the position */
+  takes: T[];
+}
+
+interface TradeTotalVolumeInfo {
+  orders: { quoted: number; base: number };
+  fees: { quoted: number; base: number };
+}
+
+interface TradeInfo extends FullTradeInfoArgs<TradeOrder> {
   totalVolume: {
-    entries: {
-      orders: { quoted: number; base: number };
-      fees: { quoted: number; base: number };
-    };
-    stops: {
-      orders: { quoted: number; base: number };
-      fees: { quoted: number; base: number };
-    };
+    entries: TradeTotalVolumeInfo;
+    stops: TradeTotalVolumeInfo;
+    takes: TradeTotalVolumeInfo;
   };
 }
 
@@ -62,120 +60,102 @@ export class ZRisk {
   ) {}
 
   /**
-   * @return summary volume of the trade in quoted units
+   * @return total volume of the trade in quoted units
    * @todo: test
    */
-  public tradeVolumeQuoted({ d, r, entries, stops }: TradeInfoArgs): number {
-    const vRisk = d * r;
+  public tradeVolumeQuoted({ deposit, risk, entries, stops }: TradeInfoArgs): number {
+    const vRisk = deposit * risk;
 
-    const x = this.math.sumBy(entries, v => v.i * v.f);
-    const y = this.math.sumBy(entries, v => v.i / v.p)
+    const x = this.math.sumBy(entries, v => v.volumePart * v.fee);
+    const y = this.math.sumBy(entries, v => v.volumePart / v.price)
       * (
-          this.math.sumBy(stops, v => v.i * v.p)
-        + this.math.sumBy(stops, v => v.i * v.f)
+          this.math.sumBy(stops, v => v.volumePart * v.price)
+        + this.math.sumBy(stops, v => v.volumePart * v.fee)
       );
 
-    return vRisk / (1 - x - y); // vSumQEntries
+    return vRisk / (1 - x - y); // vSumEntriesQ
   }
 
-  /**
-   * Distribute whole sum(sum of many or something else) for multiple parts
-   *
-   * @param sum
-   * @param percentages 0..1
-   */
-  public distribute(sum: number, percentages: number[]): number[] {
-    return percentages.map(percent => sum * percent);
-  }
+  public getTradeInfo(args: FullTradeInfoArgs): TradeInfo {
+    const Pe = args.entries.map(o => o.price);
+    const Ie = args.entries.map(o => o.volumePart);
+    const Fe = args.entries.map(o => o.fee);
 
-  public getTradeInfo(args: TradeInfoArgs): TradeInfo {
-    const Pe = args.entries.map(o => o.p);
-    const Ie = args.entries.map(o => o.i);
-    const Fe = args.entries.map(o => o.f);
+    const Ps = args.stops.map(o => o.price);
+    const Is = args.stops.map(o => o.volumePart);
+    const Fs = args.stops.map(o => o.fee);
 
-    const Ps = args.stops.map(o => o.p);
-    const Is = args.stops.map(o => o.i);
-    const Fs = args.stops.map(o => o.f);
+    const Pt = args.takes.map(o => o.price);
+    const It = args.takes.map(o => o.volumePart);
+    const Ft = args.takes.map(o => o.fee);
 
+    // Entry Volume
     const vSumEntriesQ = this.tradeVolumeQuoted(args);
     const VeQ = Ie.map(v => vSumEntriesQ * v);
     const VeB = VeQ.map((v, i) => v / Pe[i]);
     const vSumEntriesB = this.math.sum(VeB);
 
+    // Stop Volume
     const VsB = Is.map(v => vSumEntriesB * v);
     const VsQ = VsB.map((v, i) => v * Ps[i]);
     const vSumStopsB = this.math.sum(VsB);
     const vSumStopsQ = this.math.sum(VsQ);
 
-    const FeVQ = VeQ.map((v, i) => v * Fe[i]);
-    const FeVB = VeB.map((v, i) => v * Fe[i]);
-    const FsVQ = VsQ.map((v, i) => v * Fs[i]);
-    const FsVB = VsB.map((v, i) => v * Fs[i]);
+    // Take Volume
+    const VtB = It.map(v => vSumEntriesB * v);
+    const VtQ = VtB.map((v, i) => v * Pt[i]);
+    const vSumTakesB = this.math.sum(VtB);
+    const vSumTakesQ = this.math.sum(VtQ);
 
-    const vSumFeeEntryQ = this.math.sum(FeVQ);
-    const vSumFeeEntryB = this.math.sum(FeVB);
-    const vSumFeeStopQ  = this.math.sum(FsVQ);
-    const vSumFeeStopB  = this.math.sum(FsVB);
+    const { orders: entries, fees: entryFees } = this.getOrdersInfo(args.entries, VeQ, VeB, Fe);
+    const { orders: stops,   fees: stopFees }  = this.getOrdersInfo(args.stops,   VsQ, VsB, Fs);
+    const { orders: takes,   fees: takeFees }  = this.getOrdersInfo(args.takes,   VtQ, VtB, Ft);
 
     return {
       ...args,
-      entries: args.entries.map((order, i) => ({ ...order, vq: VeQ[i], vb: VeB[i], fvq: FeVQ[i], fvb: FeVB[i] })), /* tslint:disable-line:max-line-length */
-      stops:   args.stops  .map((order, i) => ({ ...order, vq: VsQ[i], vb: VsB[i], fvq: FsVQ[i], fvb: FsVB[i] })), /* tslint:disable-line:max-line-length */
+      entries,
+      stops,
+      takes,
       totalVolume: {
         entries: {
           orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
-          fees: { quoted: vSumFeeEntryQ, base: vSumFeeEntryB },
+          fees: entryFees,
         },
         stops: {
           orders: { quoted: vSumStopsQ, base: vSumStopsB, },
-          fees: { quoted: vSumFeeStopQ, base: vSumFeeStopB },
+          fees: stopFees,
+        },
+        takes: {
+          orders: { quoted: vSumTakesQ, base: vSumTakesB, },
+          fees: takeFees,
         },
       },
     };
   }
 
-  public unzip<T extends object>(objects: T[]): { [key in keyof T]?: number[] } {
-    const res: { [key in keyof T]?: number[] } = {};
-    if (!objects.length) { return res; }
+  private getOrdersInfo(
+    ordersArg: TradeOrderArg[],
+    Vq: number[],
+    Vb: number[],
+    F: number[],
+  ): { orders: TradeOrder[]; } & Pick<TradeTotalVolumeInfo, 'fees'> {
+    const fVQ = Vq.map((v, i) => v * F[i]);
+    const fVB = Vb.map((v, i) => v * F[i]);
 
-    const keys = Object.keys(objects[0]);
-    for (let i = 0; i < objects.length; i++) {
-      for (let j = 0; j < keys.length; j++) {
-        const key: keyof T = keys[j] as any;
-        if (!res[key]) {
-          res[key] = [];
-        }
-        // @ts-ignore
-        res[key][i] = objects[i][key];
-      }
-    }
+    const orders = ordersArg.map((order, i): TradeOrder => ({
+      ...order,
+      volumeQuoted:    Vq[i],
+      volumeBase:      Vb[i],
+      feeVolumeQuoted: fVQ[i],
+      feeVolumeBase:   fVB[i],
+    }));
 
-    return res;
+    const vSumFeeQ = this.math.sum(fVQ);
+    const vSumFeeB = this.math.sum(fVB);
+    const fees = { quoted: vSumFeeQ, base: vSumFeeB };
+
+    return { orders, fees };
   }
-
-  // @todo: try to rewrite with .forEach
-  public zip<T extends {[key: string]: number[]}>(map: { [key in keyof T]: number[] }): T[] {
-    const res: T[] = [];
-
-    const keys = Object.keys(map);
-    if (!keys.length) { return res; }
-
-    const len = (map[keys[0] as keyof T]).length;
-    if (!len) { return res; }
-
-    for (let i = 0; i < len; i++) {
-      const item: T = {} as any;
-      for (let j = 0; j < keys.length; j++) {
-        const key: keyof T = keys[j] as any;
-        // @ts-ignore
-        item[key] = map[key][i];
-      }
-      res.push(item);
-    }
-
-    return res;
-  }
-
 }
 
 export const zRisk = new ZRisk(zMath);
