@@ -1,2 +1,2 @@
-export { zRisk } from './z-risk';
-export { zMath } from './z-math';
+export { zRisk, ZRisk, TradeInfo, TradeInfoArgs } from './z-risk';
+export { zMath, ZMath } from './z-math';

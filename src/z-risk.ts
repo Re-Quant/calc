@@ -23,7 +23,7 @@ interface TradeOrder extends TradeOrderArg {
   feeVolumeBase: number;
 }
 
-export interface TradeInfoArgs<T = TradeOrderArg> {
+export interface TradeVolumeArgs<T = TradeOrderArg> {
   /** Whole Deposit */
   deposit: number;
   /** Maximum risk for the trade (percent 0..1) */
@@ -35,7 +35,7 @@ export interface TradeInfoArgs<T = TradeOrderArg> {
   stops: T[];
 }
 
-interface FullTradeInfoArgs<T = TradeOrderArg> extends TradeInfoArgs<T> {
+export interface TradeInfoArgs<T = TradeOrderArg> extends TradeVolumeArgs<T> {
   /** Take-Profit Orders - Distribute the position */
   takes: T[];
 }
@@ -45,7 +45,7 @@ interface TradeTotalVolumeInfo {
   fees: { quoted: number; base: number };
 }
 
-interface TradeInfo extends FullTradeInfoArgs<TradeOrder> {
+export interface TradeInfo extends TradeInfoArgs<TradeOrder> {
   totalVolume: {
     entries: TradeTotalVolumeInfo;
     stops: TradeTotalVolumeInfo;
@@ -63,7 +63,7 @@ export class ZRisk {
    * @return total volume of the trade in quoted units
    * @todo: test
    */
-  public tradeVolumeQuoted({ deposit, risk, entries, stops }: TradeInfoArgs): number {
+  public tradeVolumeQuoted({ deposit, risk, entries, stops }: TradeVolumeArgs): number {
     const vRisk = deposit * risk;
 
     const x = this.math.sumBy(entries, v => v.volumePart * v.fee);
@@ -76,7 +76,7 @@ export class ZRisk {
     return vRisk / (1 - x - y); // vSumEntriesQ
   }
 
-  public getTradeInfo(args: FullTradeInfoArgs): TradeInfo {
+  public getTradeInfo(args: TradeInfoArgs): TradeInfo {
     const Pe = args.entries.map(o => o.price);
     const Ie = args.entries.map(o => o.volumePart);
     const Fe = args.entries.map(o => o.fee);
