@@ -1,6 +1,6 @@
 import { zMath, ZMath } from './z-math';
 
-interface TradeOrderArg {
+export interface TradeOrderArg {
   /** Price for the order execution */
   price: number;
   /** Part of total volume for this trade (percent 0..1) */
@@ -12,7 +12,7 @@ interface TradeOrderArg {
   fee: number;
 }
 
-interface TradeOrder extends TradeOrderArg {
+export interface TradeOrder extends TradeOrderArg {
   /** Volume for the order in Quoted units */
   volumeQuoted: number;
   /** Volume for the order in Base units */
@@ -47,6 +47,8 @@ interface TradeTotalVolumeInfo {
 
 export interface TradeInfo extends TradeInfoArgs<TradeOrder> {
   totalVolume: {
+    lossQuoted: number;
+    profitQuoted: number;
     entries: TradeTotalVolumeInfo;
     stops: TradeTotalVolumeInfo;
     takes: TradeTotalVolumeInfo;
@@ -69,11 +71,11 @@ export class ZRisk {
     const x = this.math.sumBy(entries, v => v.volumePart * v.fee);
     const y = this.math.sumBy(entries, v => v.volumePart / v.price)
       * (
-          this.math.sumBy(stops, v => v.volumePart * v.price)
-        + this.math.sumBy(stops, v => v.volumePart * v.fee)
+          this.math.sumBy(stops, v => v.volumePart * v.price * v.fee)
+        - this.math.sumBy(stops, v => v.volumePart * v.price)
       );
 
-    return vRisk / (1 - x - y); // vSumEntriesQ
+    return vRisk / (1 + x + y); // vSumEntriesQ
   }
 
   public getTradeInfo(args: TradeInfoArgs): TradeInfo {
@@ -90,7 +92,7 @@ export class ZRisk {
     const Ft = args.takes.map(o => o.fee);
 
     // Entry Volume
-    const vSumEntriesQ = this.tradeVolumeQuoted(args);
+    const vSumEntriesQ = this.tradeVolumeQuoted(args);  /* ? */
     const VeQ = Ie.map(v => vSumEntriesQ * v);
     const VeB = VeQ.map((v, i) => v / Pe[i]);
     const vSumEntriesB = this.math.sum(VeB);
@@ -99,7 +101,7 @@ export class ZRisk {
     const VsB = Is.map(v => vSumEntriesB * v);
     const VsQ = VsB.map((v, i) => v * Ps[i]);
     const vSumStopsB = this.math.sum(VsB);
-    const vSumStopsQ = this.math.sum(VsQ);
+    const vSumStopsQ = this.math.sum(VsQ);  /* ? */
 
     // Take Volume
     const VtB = It.map(v => vSumEntriesB * v);
@@ -111,12 +113,17 @@ export class ZRisk {
     const { orders: stops,   fees: stopFees }  = this.getOrdersInfo(args.stops,   VsQ, VsB, Fs);
     const { orders: takes,   fees: takeFees }  = this.getOrdersInfo(args.takes,   VtQ, VtB, Ft);
 
+    const lossQuoted   = vSumEntriesQ - vSumStopsQ + entryFees.quoted + stopFees.quoted;
+    const profitQuoted = vSumTakesQ - vSumEntriesQ - takeFees.quoted - entryFees.quoted;
+
     return {
       ...args,
       entries,
       stops,
       takes,
       totalVolume: {
+        lossQuoted,
+        profitQuoted,
         entries: {
           orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
           fees: entryFees,
@@ -139,19 +146,19 @@ export class ZRisk {
     Vb: number[],
     F: number[],
   ): { orders: TradeOrder[]; } & Pick<TradeTotalVolumeInfo, 'fees'> {
-    const fVQ = Vq.map((v, i) => v * F[i]);
-    const fVB = Vb.map((v, i) => v * F[i]);
+    const FvQ = Vq.map((v, i) => v * F[i]);
+    const FvB = Vb.map((v, i) => v * F[i]);
 
     const orders = ordersArg.map((order, i): TradeOrder => ({
       ...order,
       volumeQuoted:    Vq[i],
       volumeBase:      Vb[i],
-      feeVolumeQuoted: fVQ[i],
-      feeVolumeBase:   fVB[i],
+      feeVolumeQuoted: FvQ[i],
+      feeVolumeBase:   FvB[i],
     }));
 
-    const vSumFeeQ = this.math.sum(fVQ);
-    const vSumFeeB = this.math.sum(fVB);
+    const vSumFeeQ = this.math.sum(FvQ);
+    const vSumFeeB = this.math.sum(FvB);
     const fees = { quoted: vSumFeeQ, base: vSumFeeB };
 
     return { orders, fees };
