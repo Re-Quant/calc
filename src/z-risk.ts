@@ -1,12 +1,23 @@
 import { zMath, ZMath } from './z-math';
 
-interface TradeSumOrder {
+interface TradeOrderArg {
   /** Price for the order execution */
   p: number;
   /** Part of whole money sum for this trade (percent 0..1) */
   i: number;
   /** Fee for the order (percent 0..1) */
   f: number;
+}
+
+interface TradeOrder extends TradeOrderArg {
+  /** Volume for the order in Quoted units */
+  vq: number;
+  /** Volume for the order in Base units */
+  vb: number;
+  /** Fee Volume for the order in Quoted units */
+  fvq: number;
+  /** Fee Volume for the order in Base units */
+  fvb: number;
 }
 
 // function validateOrderPartPercentages(entries: TradeSumOrder[], stops: TradeSumOrder[]) {
@@ -19,16 +30,29 @@ interface TradeSumOrder {
 //   }
 // }
 
-export interface TradeInfoArgs {
+export interface TradeInfoArgs<T = TradeOrderArg> {
   /** Whole Deposit */
   d: number;
   /** Maximum risk for the trade (percent 0..1) */
   r: number;
 
   /** Entry Orders - Orders for get a position */
-  entries: TradeSumOrder[];
+  entries: T[];
   /** Stop-Loss Orders - Get rid of the position */
-  stops: TradeSumOrder[];
+  stops: T[];
+}
+
+interface TradeInfo extends TradeInfoArgs<TradeOrder> {
+  totalVolume: {
+    entries: {
+      orders: { quoted: number; base: number };
+      fees: { quoted: number; base: number };
+    };
+    stops: {
+      orders: { quoted: number; base: number };
+      fees: { quoted: number; base: number };
+    };
+  };
 }
 
 export class ZRisk {
@@ -51,7 +75,7 @@ export class ZRisk {
         + this.math.sumBy(stops, v => v.i * v.f)
       );
 
-    return vRisk / (1 - x - y); // vSumQOriginal
+    return vRisk / (1 - x - y); // vSumQEntries
   }
 
   /**
@@ -64,18 +88,50 @@ export class ZRisk {
     return percentages.map(percent => sum * percent);
   }
 
-  public getTradeInfo(args: TradeInfoArgs) {
+  public getTradeInfo(args: TradeInfoArgs): TradeInfo {
     const Pe = args.entries.map(o => o.p);
     const Ie = args.entries.map(o => o.i);
     const Fe = args.entries.map(o => o.f);
+
     const Ps = args.stops.map(o => o.p);
     const Is = args.stops.map(o => o.i);
     const Fs = args.stops.map(o => o.f);
 
-    const vSumQOriginal = this.tradeVolumeQuoted(args);
-    const Ve = args.entries.map(o => vSumQOriginal * o.i);
-    const vSumBOriginal = this.math.sigmaSum(Ve, i => Ve[i] / Pe[i]);
+    const vSumEntriesQ = this.tradeVolumeQuoted(args);
+    const VeQ = Ie.map(v => vSumEntriesQ * v);
+    const VeB = VeQ.map((v, i) => v / Pe[i]);
+    const vSumEntriesB = this.math.sum(VeB);
 
+    const VsB = Is.map(v => vSumEntriesB * v);
+    const VsQ = VsB.map((v, i) => v * Ps[i]);
+    const vSumStopsB = this.math.sum(VsB);
+    const vSumStopsQ = this.math.sum(VsQ);
+
+    const FeVQ = VeQ.map((v, i) => v * Fe[i]);
+    const FeVB = VeB.map((v, i) => v * Fe[i]);
+    const FsVQ = VsQ.map((v, i) => v * Fs[i]);
+    const FsVB = VsB.map((v, i) => v * Fs[i]);
+
+    const vSumFeeEntryQ = this.math.sum(FeVQ);
+    const vSumFeeEntryB = this.math.sum(FeVB);
+    const vSumFeeStopQ  = this.math.sum(FsVQ);
+    const vSumFeeStopB  = this.math.sum(FsVB);
+
+    return {
+      ...args,
+      entries: args.entries.map((order, i) => ({ ...order, vq: VeQ[i], vb: VeB[i], fvq: FeVQ[i], fvb: FeVB[i] })), /* tslint:disable-line:max-line-length */
+      stops:   args.stops  .map((order, i) => ({ ...order, vq: VsQ[i], vb: VsB[i], fvq: FsVQ[i], fvb: FsVB[i] })), /* tslint:disable-line:max-line-length */
+      totalVolume: {
+        entries: {
+          orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
+          fees: { quoted: vSumFeeEntryQ, base: vSumFeeEntryB },
+        },
+        stops: {
+          orders: { quoted: vSumStopsQ, base: vSumStopsB, },
+          fees: { quoted: vSumFeeStopQ, base: vSumFeeStopB },
+        },
+      },
+    };
   }
 
   public unzip<T extends object>(objects: T[]): { [key in keyof T]?: number[] } {
