@@ -140,8 +140,10 @@ describe('ZRisk', () => {
         expect(takes[0].feeVolumeBase).to.equal(0);
         expect(takes[0].feeVolumeQuoted).to.equal(0);
 
-        // @todo: check loss
-        // @todo: check profit
+        // max profit & max loss
+        expect(totalVolume.profitQuoted /* ? */).to.roundEq(5000);
+        expect(totalVolume.lossQuoted /* ? */).to.roundEq(1000);
+
         // the main assertion
         expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
       });
@@ -305,8 +307,10 @@ describe('ZRisk', () => {
         expect(takes[0].feeVolumeBase).to.equal(0);
         expect(takes[0].feeVolumeQuoted).to.equal(0);
 
-        // @todo: check loss
-        // @todo: check profit
+        // max profit & max loss
+        expect(totalVolume.profitQuoted /* ? */).to.roundEq(5000);
+        expect(totalVolume.lossQuoted /* ? */).to.roundEq(1000);
+
         // the main assertion
         expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
       });
