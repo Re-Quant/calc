@@ -1,4 +1,3 @@
-
 // tslint:disable-next-line:no-namespace
 declare namespace Chai {
   interface Assertion {
@@ -7,6 +6,12 @@ declare namespace Chai {
     floatEqls(value: number): Assertion;
     floatEqual(value: number): Assertion;
     floatEquals(value: number): Assertion;
+
+    roundEq(value: number, precision?: number): Assertion;
+    roundEql(value: number, precision?: number): Assertion;
+    roundEqls(value: number, precision?: number): Assertion;
+    roundEqual(value: number, precision?: number): Assertion;
+    roundEquals(value: number, precision?: number): Assertion;
   }
 }
 
