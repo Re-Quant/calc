@@ -8,6 +8,7 @@ const wallabyPostprocessor = wallabyWebpack(
     require('./webpack/webpack.wallabyjs')({ env: 'test' }),
     {
       entryPatterns: [
+        'src/chai/index.js',
         'src/**/*.spec.js',
         // 'src/**/*.js',
       ],
@@ -19,6 +20,7 @@ module.exports = function (w) {
 
   return {
     files: [
+      { pattern: 'src/chai/index.ts', load: false },
       { pattern: 'src/**/*.ts', load: false },
       { pattern: 'src/**/*.spec.ts', ignore: true },
     ],

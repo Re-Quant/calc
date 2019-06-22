@@ -1,34 +1,6 @@
 // tslint:disable:no-unused-expression
-import * as chai from 'chai';
 import { TradeInfoArgs, TradeOrderArg, ZRisk } from './z-risk';
 import { zMath } from './z-math';
-
-// @todo: move this custom Chai method definition to the separate file
-chai.use((_chai, utils) => {
-  const Assertion = _chai.Assertion;
-
-  function floatEqual(this: any, expectedFloat: number) {
-    const actualFloat: any = this._obj;
-
-    // first, our instanceof check, shortcut
-    new Assertion(actualFloat).to.be.a('number');
-
-    // second, our type check
-    this.assert(
-      Math.abs(actualFloat - expectedFloat) < Number.EPSILON,
-      'expected #{this} to equal(floating) #{exp}',
-      'expected #{this} to not equal(floating) #{act}',
-      expectedFloat,  // expected
-      actualFloat,    // actual
-    );
-  }
-
-  Assertion.addMethod('floatEq', floatEqual);
-  Assertion.addMethod('floatEql', floatEqual);
-  Assertion.addMethod('floatEqls', floatEqual);
-  Assertion.addMethod('floatEqual', floatEqual);
-  Assertion.addMethod('floatEquals', floatEqual);
-});
 
 describe('ZRisk', () => {
   let zRisk: ZRisk;
