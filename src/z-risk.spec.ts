@@ -1,7 +1,8 @@
 // tslint:disable:no-unused-expression
 /* tslint:disable:space-in-parens */
-import { ETradeType, TotalVolumeInfo, TradeInfoArgs, TradeVolumeInfoArgs, ZRisk } from './z-risk';
+import { ZRisk } from './z-risk';
 import { zMath } from './z-math';
+import { ETradeType, TotalVolumeInfo, TradeInfoArgs, TradeVolumeInfoArgs  } from './models';
 
 describe('ZRisk', () => {
   let zRisk: ZRisk;
@@ -139,6 +140,8 @@ describe('ZRisk', () => {
         expect(takes[0].feeVolumeBase).to.equal(0);
         expect(takes[0].feeVolumeQuoted).to.equal(0);
 
+        // @todo: check loss
+        // @todo: check profit
         // the main assertion
         expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
       });
@@ -263,7 +266,7 @@ describe('ZRisk', () => {
         },
       );
 
-      it('should calculate Long trade with one order and manual orders calculation', () => {
+      it('should calculate Short trade with one order and manual orders calculation', () => {
         // arrange
         const args = {
           ...commonShortInfo,
@@ -302,6 +305,8 @@ describe('ZRisk', () => {
         expect(takes[0].feeVolumeBase).to.equal(0);
         expect(takes[0].feeVolumeQuoted).to.equal(0);
 
+        // @todo: check loss
+        // @todo: check profit
         // the main assertion
         expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
       });
