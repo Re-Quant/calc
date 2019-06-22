@@ -44,14 +44,11 @@ export class ZMath {
 
     let sum = 0;
     if (payload) {
-      for (let i = from; i <= to; i++) {
-        sum += cb(i, payload[i]);
-      }
+      for (let i = from; i <= to; i++) sum += cb(i, payload[i]);
     } else {
-      for (let i = from; i <= to; i++) {
-        sum += cb(i);
-      }
+      for (let i = from; i <= to; i++) sum += cb(i);
     }
+
     return sum;
   }
 
@@ -76,7 +73,10 @@ export class ZMath {
   }
 
   public sum(arr: number[]): number {
-    return arr.reduce((sum, b) => sum + b, 0);
+    let sum = 0;
+    for (let i = 0, ilen = arr.length; i < ilen; i++) sum += arr[i];
+
+    return sum;
   }
 
   /**
@@ -84,11 +84,15 @@ export class ZMath {
    * @param picker callback or field name
    */
   public sumBy<T>(arr: T[], picker: keyof T | ((v: T, i: number) => number)): number {
+    let sum = 0;
+
     if (typeof picker === 'function') {
-      return arr.reduce((sum: number, curr: T, i: number) => sum + picker(curr as T, i), 0);
+      for (let i = 0, ilen = arr.length; i < ilen; i++) sum += picker(arr[i], i);
+    } else {
+      for (let i = 0, ilen = arr.length; i < ilen; i++) sum += +arr[i][picker];
     }
 
-    return arr.reduce((sum: number, curr) => sum + +curr[picker], 0);
+    return sum;
   }
 
 }
