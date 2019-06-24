@@ -44,7 +44,9 @@ export class ZRisk {
     return vRisk / (x / y - 1 + fe + fs); // vSumEntriesQ
   }
 
-  public manageTradeVolume({ preliminaryVolume, ...p }: TradeVolumeManagementArgs): TradeVolumeManagement {
+  public manageTradeVolume(
+    { preliminaryVolume, ...p }: TradeVolumeManagementArgs,
+  ): TradeVolumeManagement {
     let totalTradeVolumeQuoted = preliminaryVolume;
     const preliminaryLeverage = totalTradeVolumeQuoted / p.deposit;
 
