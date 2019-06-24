@@ -7,6 +7,6 @@ export {
   TradeOrder,
   TradeOrderArg,
   TradeVolumeArgs,
-  TradeVolumeInfo,
-  TradeVolumeInfoArgs,
+  TradeVolumeManagement,
+  TradeVolumeManagementArgs,
 } from './models';

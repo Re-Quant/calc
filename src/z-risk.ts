@@ -6,7 +6,7 @@ import {
   TradeInfo, TradeInfoArgs,
   TradeOrder, TradeOrderArg,
   TradeTotalVolumeInfo,
-  TradeVolumeArgs, TradeVolumeInfo, TradeVolumeInfoArgs,
+  TradeVolumeArgs, TradeVolumeManagement, TradeVolumeManagementArgs,
 } from './models';
 
 // @todo: implement AVG Prices calculation
@@ -44,7 +44,7 @@ export class ZRisk {
     return vRisk / (x / y - 1 + fe + fs); // vSumEntriesQ
   }
 
-  public manageTradeVolume({ preliminaryVolume, ...p }: TradeVolumeInfoArgs): TradeVolumeInfo {
+  public manageTradeVolume({ preliminaryVolume, ...p }: TradeVolumeManagementArgs): TradeVolumeManagement {
     let totalTradeVolumeQuoted = preliminaryVolume;
     const preliminaryLeverage = totalTradeVolumeQuoted / p.deposit;
 

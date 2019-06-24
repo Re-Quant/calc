@@ -144,8 +144,8 @@ describe('index.ts', () => {
       };
     });
 
-    it('TradeVolumeInfo should be exported', () => {
-      const data: index.TradeVolumeInfo = {
+    it('TradeVolumeManagement should be exported', () => {
+      const data: index.TradeVolumeManagement = {
         deposit: 1000,
         risk: .01,
         leverage: {
@@ -158,8 +158,8 @@ describe('index.ts', () => {
       };
     });
 
-    it('TradeVolumeInfoArgs should be exported', () => {
-      const data: index.TradeVolumeInfoArgs = {
+    it('TradeVolumeManagementArgs should be exported', () => {
+      const data: index.TradeVolumeManagementArgs = {
         deposit: 1000,
         risk: .01,
         leverage: {

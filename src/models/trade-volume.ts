@@ -47,12 +47,10 @@ export interface TradeVolumeCommonInfoArgs<L = LeverageInfoArgs> extends Deposit
 export interface TradeVolumeCommonInfo extends TradeVolumeCommonInfoArgs<LeverageInfo> {
 }
 
-// @todo: rename to TradeVolumeManagementArgs
-export interface TradeVolumeInfoArgs extends TradeVolumeCommonInfoArgs {
+export interface TradeVolumeManagementArgs extends TradeVolumeCommonInfoArgs {
   preliminaryVolume: number;
 }
 
-// @todo: rename to TradeVolumeManagement
-export interface TradeVolumeInfo extends TradeVolumeCommonInfoArgs<LeverageInfo> {
+export interface TradeVolumeManagement extends TradeVolumeCommonInfoArgs<LeverageInfo> {
   totalTradeVolumeQuoted: number;
 }

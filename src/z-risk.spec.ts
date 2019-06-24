@@ -2,7 +2,7 @@
 /* tslint:disable:space-in-parens */
 import { ZRisk } from './z-risk';
 import { zMath } from './z-math';
-import { ETradeType, TotalVolumeInfo, TradeInfoArgs, TradeVolumeInfoArgs  } from './models';
+import { ETradeType, TotalVolumeInfo, TradeInfoArgs, TradeVolumeManagementArgs  } from './models';
 
 describe('ZRisk', () => {
   let zRisk: ZRisk;
@@ -371,7 +371,7 @@ describe('ZRisk', () => {
   describe('#manageTradeVolume()', () => {
 
     describe('.leverage.allow', () => {
-      const makeArgs = (allow: boolean): TradeVolumeInfoArgs => ({
+      const makeArgs = (allow: boolean): TradeVolumeManagementArgs => ({
         deposit: 1000,
         risk: .01,
         preliminaryVolume: 1500,
@@ -401,7 +401,7 @@ describe('ZRisk', () => {
     });
 
     describe('.leverage.actualTimes', () => {
-      const makeArgs = (preliminaryVolume: number): TradeVolumeInfoArgs => ({
+      const makeArgs = (preliminaryVolume: number): TradeVolumeManagementArgs => ({
         preliminaryVolume,
         deposit: 1000,
         risk: .01,
@@ -432,7 +432,7 @@ describe('ZRisk', () => {
     });
 
     describe('.leverage.maxTimes', () => {
-      const makeArgs = (preliminaryVolume: number, maxTimes = 100): TradeVolumeInfoArgs => ({
+      const makeArgs = (preliminaryVolume: number, maxTimes = 100): TradeVolumeManagementArgs => ({
         preliminaryVolume,
         deposit: 1000,
         risk: .01,
@@ -463,7 +463,7 @@ describe('ZRisk', () => {
     });
 
     describe('.maxTradeVolumeQuoted', () => {
-      const makeArgs = (volume: number, maxVolume = +Infinity): TradeVolumeInfoArgs => ({
+      const makeArgs = (volume: number, maxVolume = +Infinity): TradeVolumeManagementArgs => ({
         preliminaryVolume: volume,
         maxTradeVolumeQuoted: maxVolume,
         deposit: 1000,
