@@ -21,11 +21,8 @@ module.exports = (options) => {
       rules: [
         {
           test: /\.ts$/,
-          loader: 'awesome-typescript-loader',
+          loader: 'ts-loader',
           exclude: /node_modules/,
-          options: {
-            useCache: true,
-          },
         },
       ]
     },

@@ -7,7 +7,6 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "noEmit": true,
     "noEmitHelpers": true,
     "importHelpers": true,
     "strict": true,
@@ -30,7 +29,9 @@
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/chai",
+    "**/*.spec.ts"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
