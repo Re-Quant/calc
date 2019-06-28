@@ -15,6 +15,7 @@ module.exports = (options) => {
     output: {
       filename: 'index.js',
       path: root('./dist'),
+      libraryTarget: 'umd',
     },
 
     module: {
