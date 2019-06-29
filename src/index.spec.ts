@@ -18,6 +18,25 @@ describe('index.ts', () => {
       expect(Object.keys(index.ETradeType).length).to.eq(2);
     });
 
+    it('PriceAndVolumePart should be exported', () => {
+      const data: index.PriceAndVolumePart = {
+        price: 1000,
+        volumePart: .5,
+      };
+    });
+
+    it('BreakevenPriceArgs should be exported', () => {
+      const data: index.BreakevenPriceArgs = {
+        breakeven: { fee: .002 },
+        totalVolume: {
+          entries: {
+            orders: { quoted: 1000, base: 10 },
+            fees: { quoted: 10 },
+          },
+        },
+      };
+    });
+
     it('TradeInfo should be exported', () => {
       const data: index.TradeInfo = {
         deposit: 1000,
@@ -33,6 +52,10 @@ describe('index.ts', () => {
           entry: 1000,
           stop: 800,
           take: 2000,
+        },
+        breakeven: {
+          fee: .002,
+          price: 1100,
         },
         entries: [{
           price: 1000,
@@ -90,6 +113,9 @@ describe('index.ts', () => {
         },
         maxTradeVolumeQuoted: 10000,
         tradeType: ETradeType.Long,
+        breakeven: {
+          fee: .002,
+        },
         entries: [{
           price: 1000,
           fee: .001,

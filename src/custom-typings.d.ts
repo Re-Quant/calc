@@ -7,6 +7,7 @@ declare namespace Chai {
     floatEqual(value: number): Assertion;
     floatEquals(value: number): Assertion;
 
+    /** default precision is 10 */
     roundEq(value: number, precision?: number): Assertion;
     roundEql(value: number, precision?: number): Assertion;
     roundEqls(value: number, precision?: number): Assertion;

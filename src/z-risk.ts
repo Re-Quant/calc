@@ -2,7 +2,7 @@ import { zMath, ZMath } from './z-math';
 import {
   AllOrderGroups,
   AvgPrices,
-  AvgPricesArgs,
+  AvgPricesArgs, BreakevenInfo, BreakevenPriceArgs,
   ETradeType,
   FlattenOrdersGroups,
   OrdersInfo,
@@ -106,6 +106,11 @@ export class ZRisk {
     return this.math.sumBy(orders, v => v.volumePart * v.price);
   }
 
+  public breakevenPrice({ totalVolume: tv, breakeven }: BreakevenPriceArgs): number {
+    return (tv.entries.orders.quoted + tv.entries.fees.quoted)
+        / ((tv.entries.orders.base) * (1 - breakeven.fee));
+  }
+
   public getTradeInfo(p: TradeInfoArgs): TradeInfo {
     const preliminaryVolume = p.tradeType === ETradeType.Long
                                    ? this.getLongTradeVolumeQuoted(p)
@@ -123,10 +128,16 @@ export class ZRisk {
 
     const avgPrices = this.getAvgPricesInfo(p);
 
+    const breakeven: BreakevenInfo = {
+      ...p.breakeven,
+      price: this.breakevenPrice({ ...p, ...ordersInfo }),
+    };
+
     return {
       ...p,
       ...tradeVolumeInfo,
       ...ordersInfo,
+      breakeven,
       avgPrices,
     };
   }

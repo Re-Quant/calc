@@ -29,6 +29,7 @@ describe('ZRisk', () => {
           allow: true,
           maxTimes: 3,
         },
+        breakeven: { fee: .002 },
       };
       runLongIt(
         'should calculate Long trade type with multiple orders',
@@ -204,6 +205,41 @@ describe('ZRisk', () => {
         expect(vTakeBaseAvgPrice).to.roundEq(vTakeBaseAvgPriceExpected);
       });
 
+      it('should calculate breakeven price correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 10 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops: [
+            { price: 6900, volumePart: .5,  fee: 0.002 },
+            { price: 6800, volumePart: .25, fee: 0.002 },
+            { price: 6500, volumePart: .25, fee: 0.002 },
+          ],
+          takes: [],
+        };
+
+        // act
+        const { breakeven, totalVolume: tv } = zRisk.getTradeInfo(args); /* ? $.breakeven.price */
+
+        // post arrange
+        const vBreakevenQ = tv.entries.orders.base * breakeven.price; /* ? */
+        const vBreakevenFeeQ = vBreakevenQ * breakeven.fee; /* ? */
+        const actualLossByBreakevenPrice = vBreakevenQ
+                                         - tv.entries.orders.quoted
+                                         - tv.entries.fees.quoted
+                                         - vBreakevenFeeQ; /* ? */
+
+        // assert
+        expect(breakeven.fee).to.eq(args.breakeven.fee);
+        expect(actualLossByBreakevenPrice).to.roundEq(0);
+      });
+
       function runLongIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -252,6 +288,7 @@ describe('ZRisk', () => {
           allow: true,
           maxTimes: 3,
         },
+        breakeven: { fee: .002 },
       };
 
       runShortIt(
@@ -426,6 +463,41 @@ describe('ZRisk', () => {
         expect(vEntryBaseAvgPrice).to.roundEq(vEntryBaseAvgPriceExpected);
         expect(vStopBaseAvgPrice).to.roundEq(vStopBaseAvgPriceExpected);
         expect(vTakeBaseAvgPrice).to.roundEq(vTakeBaseAvgPriceExpected);
+      });
+
+      it('should calculate breakeven price correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 10 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops: [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes: [],
+        };
+
+        // act
+        const { breakeven, totalVolume: tv } = zRisk.getTradeInfo(args); /* ? $.breakeven.price */
+
+        // post arrange
+        const vBreakevenQ = tv.entries.orders.base * breakeven.price; /* ? */
+        const vBreakevenFeeQ = vBreakevenQ * breakeven.fee; /* ? */
+        const actualLossByBreakevenPrice = vBreakevenQ
+                                         - tv.entries.orders.quoted
+                                         - tv.entries.fees.quoted
+                                         - vBreakevenFeeQ; /* ? */
+
+        // assert
+        expect(breakeven.fee).to.eq(args.breakeven.fee);
+        expect(actualLossByBreakevenPrice).to.roundEq(0);
       });
 
       function runShortIt(message: string, args: TradeInfoArgs) {

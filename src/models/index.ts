@@ -6,3 +6,4 @@ export * from './trade-info';
 export * from './trade-order';
 export * from './trade-total-volume';
 export * from './trade-volume';
+export * from './breakeven';
