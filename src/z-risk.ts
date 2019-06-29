@@ -1,15 +1,22 @@
 import { zMath, ZMath } from './z-math';
 import {
-  AllOrderGroups, FlattenOrdersGroups,
+  AllOrderGroups,
+  AvgPrices,
+  AvgPricesArgs,
   ETradeType,
-  OrdersInfo, OrdersInfoArg,
-  TradeInfo, TradeInfoArgs,
-  TradeOrder, TradeOrderArg,
+  FlattenOrdersGroups,
+  OrdersInfo,
+  OrdersInfoArg,
+  PriceAndVolumePart,
+  TradeInfo,
+  TradeInfoArgs,
+  TradeOrder,
+  TradeOrderArg,
   TradeTotalVolumeInfo,
-  TradeVolumeArgs, TradeVolumeManagement, TradeVolumeManagementArgs,
+  TradeVolumeArgs,
+  TradeVolumeManagement,
+  TradeVolumeManagementArgs,
 } from './models';
-
-// @todo: implement AVG Prices calculation
 
 export class ZRisk {
 
@@ -33,6 +40,9 @@ export class ZRisk {
     return vRisk / (1 + x + y); // vSumEntriesQ
   }
 
+  /**
+   * @return total volume of the trade in quoted units
+   */
   public getShortTradeVolumeQuoted({ deposit, risk, entries, stops }: TradeVolumeArgs): number {
     const vRisk = deposit * risk;
 
@@ -80,6 +90,22 @@ export class ZRisk {
     };
   }
 
+  /**
+   * Calculates average price for case when you want cut {@link PriceAndVolumePart.volumePart}
+   * of the total volume in quoted units
+   */
+  public avgPriceOfQuoted(orders: PriceAndVolumePart[]): number {
+    return 1 / this.math.sumBy(orders, v => v.volumePart / v.price);
+  }
+
+  /**
+   * Calculates average price for case when you want cut {@link PriceAndVolumePart.volumePart}
+   * of the total volume in base units
+   */
+  public avgPriceOfBase(orders: PriceAndVolumePart[]): number {
+    return this.math.sumBy(orders, v => v.volumePart * v.price);
+  }
+
   public getTradeInfo(p: TradeInfoArgs): TradeInfo {
     const preliminaryVolume = p.tradeType === ETradeType.Long
                                    ? this.getLongTradeVolumeQuoted(p)
@@ -95,11 +121,27 @@ export class ZRisk {
                        ? this.getLongTradeOrdersInfo(orderInfoArgs)
                        : this.getShortTradeOrdersInfo(orderInfoArgs);
 
+    const avgPrices = this.getAvgPricesInfo(p);
+
     return {
       ...p,
       ...tradeVolumeInfo,
       ...ordersInfo,
+      avgPrices,
     };
+  }
+
+  private getAvgPricesInfo(p: AvgPricesArgs): AvgPrices {
+    return p.tradeType === ETradeType.Long
+           ? {
+             entry: this.avgPriceOfQuoted(p.entries),
+             stop:  this.avgPriceOfBase(p.stops),
+             take:  this.avgPriceOfBase(p.takes), }
+           : {
+             entry: this.avgPriceOfQuoted(p.entries),
+             stop:  this.avgPriceOfQuoted(p.stops),
+             take:  this.avgPriceOfQuoted(p.takes),
+           };
   }
 
   private getLongTradeOrdersInfo(p: OrdersInfoArg): OrdersInfo {
@@ -111,12 +153,12 @@ export class ZRisk {
     const vSumEntriesQ = p.totalTradeVolumeQuoted;  /* ? */
     const VeQ = Ie.map(v => vSumEntriesQ * v);
     const VeB = VeQ.map((v, i) => v / Pe[i]);
-    const vSumEntriesB = this.math.sum(VeB);
+    const vSumEntriesB = this.math.sum(VeB);  /* ? */
 
     // Stop Volume
     const VsB = Is.map(v => vSumEntriesB * v);
     const VsQ = VsB.map((v, i) => v * Ps[i]);
-    const vSumStopsB = this.math.sum(VsB);
+    const vSumStopsB = this.math.sum(VsB);  /* ? */
     const vSumStopsQ = this.math.sum(VsQ);  /* ? */
 
     // Take Volume

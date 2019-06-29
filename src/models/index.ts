@@ -1,3 +1,4 @@
+export * from './avg-prices';
 export * from './trade-type.enum';
 export * from './order-groups';
 export * from './orders-info';

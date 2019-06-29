@@ -29,10 +29,15 @@ describe('index.ts', () => {
         },
         maxTradeVolumeQuoted: 10000,
         tradeType: ETradeType.Long,
+        avgPrices: {
+          entry: 1000,
+          stop: 800,
+          take: 2000,
+        },
         entries: [{
           price: 1000,
           fee: .001,
-          volumePart: 500,
+          volumePart: 1,
           volumeBase: 1,
           volumeQuoted: 1000,
           feeVolumeBase: .0001,
@@ -41,7 +46,7 @@ describe('index.ts', () => {
         stops: [{
           price: 1000,
           fee: .001,
-          volumePart: 500,
+          volumePart: 1,
           volumeBase: 1,
           volumeQuoted: 1000,
           feeVolumeBase: .0001,
@@ -50,7 +55,7 @@ describe('index.ts', () => {
         takes: [{
           price: 1000,
           fee: .001,
-          volumePart: 500,
+          volumePart: 1,
           volumeBase: 1,
           volumeQuoted: 1000,
           feeVolumeBase: .0001,

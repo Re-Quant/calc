@@ -1,8 +1,11 @@
-export interface TradeOrderArg {
+export interface PriceAndVolumePart {
   /** Price for the order execution */
   price: number;
   /** Part of total volume for this trade (percent 0..1) */
   volumePart: number;
+}
+
+export interface TradeOrderArg extends PriceAndVolumePart {
   /**
    * Fee for the order (percent 0..1)
    * Notice: absolute fee doesn't support now

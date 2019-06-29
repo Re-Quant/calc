@@ -2,7 +2,13 @@
 /* tslint:disable:space-in-parens */
 import { ZRisk } from './z-risk';
 import { zMath } from './z-math';
-import { ETradeType, TotalVolumeInfo, TradeInfoArgs, TradeVolumeManagementArgs  } from './models';
+import {
+  ETradeType,
+  PriceAndVolumePart,
+  TotalVolumeInfo,
+  TradeInfoArgs,
+  TradeVolumeManagementArgs,
+} from './models';
 
 describe('ZRisk', () => {
   let zRisk: ZRisk;
@@ -148,31 +154,88 @@ describe('ZRisk', () => {
         expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
       });
 
+      it('should calculate avg prices correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 10 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 6900, volumePart: .5,  fee: 0.002 },
+            { price: 6800, volumePart: .25, fee: 0.002 },
+            { price: 6500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 9000, volumePart: .25, fee: 0.002 },
+            { price: 9250, volumePart: .1,  fee: 0.001 },
+            { price: 9500, volumePart: .15, fee: 0.002 },
+            { price: 9900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+        const expectedEntryAvgPrice = zRisk.avgPriceOfQuoted(args.entries);  /* ? */
+        const expectedStopAvgPrice  = zRisk.avgPriceOfBase(args.stops);  /* ? */
+        const expectedTakeAvgPrice  = zRisk.avgPriceOfBase(args.takes);  /* ? */
+
+        // act
+        const { avgPrices, totalVolume } = zRisk.getTradeInfo(args);
+
+        // post arrange
+        const vEntryBaseAvgPrice = totalVolume.entries.orders.quoted / avgPrices.entry; /* ? */
+        const vEntryBaseAvgPriceExpected = totalVolume.entries.orders.base;  /* ? */
+
+        const vStopBaseAvgPrice = totalVolume.stops.orders.quoted / avgPrices.stop; /* ? */
+        const vStopBaseAvgPriceExpected = totalVolume.stops.orders.base; /* ? */
+
+        const vTakeBaseAvgPrice = totalVolume.takes.orders.quoted / avgPrices.take; /* ? */
+        const vTakeBaseAvgPriceExpected = totalVolume.takes.orders.base; /* ? */
+
+        // assert
+        expect(avgPrices.entry).to.roundEq(expectedEntryAvgPrice);
+        expect(avgPrices.stop).to.roundEq(expectedStopAvgPrice);
+        expect(avgPrices.take).to.roundEq(expectedTakeAvgPrice);
+
+        expect(vEntryBaseAvgPrice).to.roundEq(vEntryBaseAvgPriceExpected);
+        expect(vStopBaseAvgPrice).to.roundEq(vStopBaseAvgPriceExpected);
+        expect(vTakeBaseAvgPrice).to.roundEq(vTakeBaseAvgPriceExpected);
+      });
+
       function runLongIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
           const vRiskExpected = args.deposit * args.risk;  /* ? */
 
           // act
-          const { totalVolume } = zRisk.getTradeInfo(args);  /* ? */
+          const { totalVolume: tv, entries, stops, takes } = zRisk.getTradeInfo(args);  /* ? */
 
           // assert
-          const vTotalLossQuoted = totalVolume.entries.orders.quoted
-                                 - totalVolume.stops.orders.quoted
-                                 + totalVolume.entries.fees.quoted
-                                 + totalVolume.stops.fees.quoted; /* ? */
-          expect(vTotalLossQuoted).to.floatEq(totalVolume.lossQuoted);
+          const vTotalLossQuoted = tv.entries.orders.quoted
+                                 - tv.stops.orders.quoted
+                                 + tv.entries.fees.quoted
+                                 + tv.stops.fees.quoted; /* ? */
+          expect(vTotalLossQuoted).to.floatEq(tv.lossQuoted);
 
-          const vTotalProfitQuoted = totalVolume.takes.orders.quoted
-                                   - totalVolume.entries.orders.quoted
-                                   - totalVolume.takes.fees.quoted
-                                   - totalVolume.entries.fees.quoted;  /* ? */
-          expect(vTotalProfitQuoted).to.floatEq(totalVolume.profitQuoted);
+          const vTotalProfitQuoted = tv.takes.orders.quoted
+                                   - tv.entries.orders.quoted
+                                   - tv.takes.fees.quoted
+                                   - tv.entries.fees.quoted;  /* ? */
+          expect(vTotalProfitQuoted).to.floatEq(tv.profitQuoted);
 
-          totalVolumeZeroCheck(totalVolume);
+          totalVolumeZeroCheck(tv);
+
+          expect(zMath.sumBy(entries, v => v.volumeQuoted)).to.roundEq(tv.entries.orders.quoted);
+          expect(zMath.sumBy(entries, v => v.volumeBase)).to.roundEq(tv.entries.orders.base);
+          expect(zMath.sumBy(stops, v => v.volumeQuoted)).to.roundEq(tv.stops.orders.quoted);
+          expect(zMath.sumBy(stops, v => v.volumeBase)).to.roundEq(tv.stops.orders.base);
+          expect(zMath.sumBy(takes, v => v.volumeQuoted)).to.roundEq(tv.takes.orders.quoted);
+          expect(zMath.sumBy(takes, v => v.volumeBase)).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
-          expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
+          expect(tv.lossQuoted /* ? */).to.roundEq(vRiskExpected);
         });
       }
 
@@ -180,7 +243,7 @@ describe('ZRisk', () => {
 
     describe('Short trade', () => {
 
-      const commonShortInfo = {
+      const commonInfo = {
         tradeType: ETradeType.Short,
         deposit: 100 * 1000,
         risk: .01, // 1%
@@ -194,7 +257,7 @@ describe('ZRisk', () => {
       runShortIt(
         'should calculate Short trade type with multiple orders',
         {
-          ...commonShortInfo,
+          ...commonInfo,
           entries: [
             { price: 8000, volumePart: .25, fee: 0.001 },
             { price: 7500, volumePart: .25, fee: 0.002 },
@@ -217,7 +280,7 @@ describe('ZRisk', () => {
       runShortIt(
         'should calculate Short trade type with One order',
         {
-          ...commonShortInfo,
+          ...commonInfo,
           entries: [
             { price: 8000, volumePart: 1, fee: 0.001 },
           ],
@@ -233,7 +296,7 @@ describe('ZRisk', () => {
       runShortIt(
         'should calculate Short trade type with 0 fees',
         {
-          ...commonShortInfo,
+          ...commonInfo,
           entries: [
             { price: 8000, volumePart: .25, fee: 0 },
             { price: 7500, volumePart: .75, fee: 0 },
@@ -252,7 +315,7 @@ describe('ZRisk', () => {
       runShortIt(
         'should calculate Short trade type with Large fees',
         {
-          ...commonShortInfo,
+          ...commonInfo,
           entries: [
             { price: 8000, volumePart: .25, fee: 0.1 },
             { price: 7500, volumePart: .75, fee: 0.2 },
@@ -271,7 +334,7 @@ describe('ZRisk', () => {
       it('should calculate Short trade with one order and manual orders calculation', () => {
         // arrange
         const args = {
-          ...commonShortInfo,
+          ...commonInfo,
           entries: [
             { price: 10000, volumePart: 1, fee: 0 },
           ],
@@ -315,6 +378,56 @@ describe('ZRisk', () => {
         expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
       });
 
+      it('should calculate avg prices correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+        const expectedEntryAvgPrice = zRisk.avgPriceOfQuoted(args.entries); /* ? */
+        const expectedStopAvgPrice  = zRisk.avgPriceOfQuoted(args.stops);   /* ? */
+        const expectedTakeAvgPrice  = zRisk.avgPriceOfQuoted(args.takes);   /* ? */
+
+        // act
+        const { avgPrices, totalVolume } = zRisk.getTradeInfo(args);
+
+        // post arrange
+        const vEntryBaseAvgPrice = totalVolume.entries.orders.quoted / avgPrices.entry; /* ? */
+        const vEntryBaseAvgPriceExpected = totalVolume.entries.orders.base;  /* ? */
+
+        const vStopBaseAvgPrice = totalVolume.stops.orders.quoted / avgPrices.stop; /* ? */
+        const vStopBaseAvgPriceExpected = totalVolume.stops.orders.base; /* ? */
+
+        const vTakeBaseAvgPrice = totalVolume.takes.orders.quoted / avgPrices.take; /* ? */
+        const vTakeBaseAvgPriceExpected = totalVolume.takes.orders.base; /* ? */
+
+        // assert
+        expect(avgPrices.entry).to.roundEq(expectedEntryAvgPrice);
+        expect(avgPrices.stop).to.roundEq(expectedStopAvgPrice);
+        expect(avgPrices.take).to.roundEq(expectedTakeAvgPrice);
+
+        expect(vEntryBaseAvgPrice).to.roundEq(vEntryBaseAvgPriceExpected);
+        expect(vStopBaseAvgPrice).to.roundEq(vStopBaseAvgPriceExpected);
+        expect(vTakeBaseAvgPrice).to.roundEq(vTakeBaseAvgPriceExpected);
+      });
+
       function runShortIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -323,26 +436,32 @@ describe('ZRisk', () => {
           const pAvgTake = 1 / zMath.sumBy(args.takes, v => v.volumePart / v.price);
 
           // act
-          const { totalVolume } = zRisk.getTradeInfo(args);  /* ? */
+          const { totalVolume: tv, entries, stops, takes } = zRisk.getTradeInfo(args);  /* ? */
 
           // assert
-          const vTotalLossQuoted = (totalVolume.entries.orders.base - totalVolume.stops.orders.base)
+          const vTotalLossQuoted = (tv.entries.orders.base - tv.stops.orders.base)
                                  * pAvgStop
-                                 + totalVolume.entries.fees.quoted
-                                 + totalVolume.stops.fees.quoted; /* ? */
-          expect(vTotalLossQuoted).to.roundEq(totalVolume.lossQuoted, 14);
+                                 + tv.entries.fees.quoted
+                                 + tv.stops.fees.quoted; /* ? */
+          expect(vTotalLossQuoted).to.roundEq(tv.lossQuoted, 14);
 
-          const vTotalProfitQuoted
-                  = (totalVolume.takes.orders.base - totalVolume.entries.orders.base)
-                  * pAvgTake
-                  - totalVolume.takes.fees.quoted
-                  - totalVolume.entries.fees.quoted;  /* ? */
-          expect(vTotalProfitQuoted).to.floatEq(totalVolume.profitQuoted);
+          const vTotalProfitQuoted = (tv.takes.orders.base - tv.entries.orders.base)
+                                   * pAvgTake
+                                   - tv.takes.fees.quoted
+                                   - tv.entries.fees.quoted;  /* ? */
+          expect(vTotalProfitQuoted).to.floatEq(tv.profitQuoted);
 
-          totalVolumeZeroCheck(totalVolume);
+          totalVolumeZeroCheck(tv);
+
+          expect(zMath.sumBy(entries, v => v.volumeQuoted)).to.roundEq(tv.entries.orders.quoted);
+          expect(zMath.sumBy(entries, v => v.volumeBase)).to.roundEq(tv.entries.orders.base);
+          expect(zMath.sumBy(stops, v => v.volumeQuoted)).to.roundEq(tv.stops.orders.quoted);
+          expect(zMath.sumBy(stops, v => v.volumeBase)).to.roundEq(tv.stops.orders.base);
+          expect(zMath.sumBy(takes, v => v.volumeQuoted)).to.roundEq(tv.takes.orders.quoted);
+          expect(zMath.sumBy(takes, v => v.volumeBase)).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
-          expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
+          expect(tv.lossQuoted /* ? */).to.roundEq(vRiskExpected);
         });
       }
     }); // end Short Trade describe()
@@ -512,5 +631,85 @@ describe('ZRisk', () => {
     });
 
   }); // end #manageTradeVolume()
+
+  describe('#avgPriceOfQuoted()', () => {
+    it('should calculate AVG Price for multiple orders', () => {
+      // arrange
+      const volumeQuoted = 1000;
+      const orders: PriceAndVolumePart[] = [
+        { price: 500,  volumePart: .5  },
+        { price: 1500, volumePart: .25 },
+        { price: 2000, volumePart: .15 },
+        { price: 1000, volumePart: .1  },
+      ];
+      const volumeBaseExpected =
+              zMath.sumBy(orders, v => volumeQuoted * v.volumePart / v.price);  /* ? */
+
+      // act
+      const avgPrice = zRisk.avgPriceOfQuoted(orders);  /* ? */
+
+      // assert
+      const volumeBase = volumeQuoted / avgPrice;  /* ? */
+      expect(volumeBase).to.roundEq(volumeBaseExpected);
+    });
+
+    it('should calculate AVG Price for single order', () => {
+      // arrange
+      const volumeQuoted = 1000; // 1000 $ for example
+      const orders: PriceAndVolumePart[] = [
+        { price: 2000, volumePart: 1 },
+      ];
+      const volumeBaseExpected =
+              zMath.sumBy(orders, v => volumeQuoted * v.volumePart / v.price);  /* ? */
+
+      // act
+      const avgPrice = zRisk.avgPriceOfQuoted(orders);  /* ? */
+
+      // assert
+      const volumeBase = volumeQuoted / avgPrice;  /* ? */
+      expect(volumeBase).to.roundEq(volumeBaseExpected);
+      expect(avgPrice).to.eq(orders[0].price);
+    });
+  });
+
+  describe('#avgPriceOfBase()', () => {
+    it('should calculate AVG Price for multiple orders', () => {
+      // arrange
+      const volumeBase = 1000; // 1000 btc for example
+      const orders: PriceAndVolumePart[] = [
+        { price: 500,  volumePart: .5  },
+        { price: 1500, volumePart: .25 },
+        { price: 2000, volumePart: .15 },
+        { price: 1000, volumePart: .1  },
+      ];
+      const volumeQuotedExpected =
+              zMath.sumBy(orders, v => volumeBase * v.volumePart * v.price);  /* ? */
+
+      // act
+      const avgPrice = zRisk.avgPriceOfBase(orders);  /* ? */
+
+      // assert
+      const volumeQuoted = volumeBase * avgPrice;  /* ? */
+      expect(volumeQuoted).to.roundEq(volumeQuotedExpected);
+    });
+
+    it('should calculate AVG Price for single order', () => {
+      // arrange
+      const volumeBase = 1000;
+      const orders: PriceAndVolumePart[] = [
+        { price: 2000, volumePart: 1 },
+      ];
+      const volumeQuotedExpected =
+              zMath.sumBy(orders, v => volumeBase * v.volumePart * v.price);  /* ? */
+
+      // act
+      const avgPrice = zRisk.avgPriceOfBase(orders);  /* ? */
+
+      // assert
+      const volumeQuoted = volumeBase * avgPrice;  /* ? */
+      expect(volumeQuoted).to.roundEq(volumeQuotedExpected);
+      expect(avgPrice).to.eq(orders[0].price);
+    });
+  });
 
 });
