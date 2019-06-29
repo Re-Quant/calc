@@ -29,7 +29,9 @@
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/chai",
+    "**/*.spec.ts"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,

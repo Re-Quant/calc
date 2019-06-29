@@ -24,6 +24,9 @@ module.exports = (options) => {
           test: /\.ts$/,
           loader: 'ts-loader',
           exclude: /node_modules/,
+          options: {
+             configFile: root('tsconfig.build.json'),
+          },
         },
       ]
     },
@@ -44,7 +47,7 @@ module.exports = (options) => {
       /**
        * Make sure root is src
        */
-      modules: [root('src'), root('node_modules')],
+      modules: [root('src'), 'node_modules'],
     },
 
     /**
