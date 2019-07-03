@@ -21,12 +21,12 @@ export interface LeverageInfoArgs {
    * - equal 3.3 - means max leverage 1:3.3 (on Bitfinex)
    * - equal 100 - means max leverage 1:100 (available on BitMEX or Forex)
    */
-  maxTimes: number;
+  max: number;
 }
 
 export interface LeverageInfo extends LeverageInfoArgs {
   /** Actual leverage quantity after final trade sum calculated */
-  actualTimes: number;
+  actual: number;
 }
 
 export interface TradeVolumeArgs<T = TradeOrderArg>

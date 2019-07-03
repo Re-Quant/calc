@@ -42,9 +42,9 @@ describe('index.ts', () => {
         deposit: 1000,
         risk: .01,
         leverage: {
-          allow: true,
-          maxTimes: 10,
-          actualTimes: 2.2,
+          allow:  true,
+          max: 10,
+          actual: 2.2,
         },
         maxTradeVolumeQuoted: 10000,
         tradeType: ETradeType.Long,
@@ -121,7 +121,7 @@ describe('index.ts', () => {
         risk: .01,
         leverage: {
           allow: true,
-          maxTimes: 10,
+          max: 10,
         },
         maxTradeVolumeQuoted: 10000,
         tradeType: ETradeType.Long,
@@ -196,9 +196,9 @@ describe('index.ts', () => {
         deposit: 1000,
         risk: .01,
         leverage: {
-          allow: true,
-          maxTimes: 3,
-          actualTimes: 2.2,
+          allow:  true,
+          max:    3,
+          actual: 2.2,
         },
         maxTradeVolumeQuoted: 100000,
         totalTradeVolumeQuoted: 1000,
@@ -211,7 +211,7 @@ describe('index.ts', () => {
         risk: .01,
         leverage: {
           allow: true,
-          maxTimes: 3,
+          max: 3,
         },
         maxTradeVolumeQuoted: 100000,
         preliminaryVolume: 1000,

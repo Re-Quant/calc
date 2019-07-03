@@ -61,28 +61,28 @@ export class ZRisk {
     let totalTradeVolumeQuoted = preliminaryVolume;
     const preliminaryLeverage = totalTradeVolumeQuoted / p.deposit;
 
-    let actualTimes = preliminaryLeverage;
+    let actual = preliminaryLeverage;
     if (p.leverage.allow) {
-      if (actualTimes < 1) { actualTimes = 1; }
-      if (actualTimes > p.leverage.maxTimes) { actualTimes = p.leverage.maxTimes; }
+      if (actual < 1) { actual = 1; }
+      if (actual > p.leverage.max) { actual = p.leverage.max; }
     } else {
-      actualTimes = 1;
+      actual = 1;
     }
 
-    if (preliminaryLeverage > actualTimes) {
-      totalTradeVolumeQuoted = p.deposit * actualTimes;
+    if (preliminaryLeverage > actual) {
+      totalTradeVolumeQuoted = p.deposit * actual;
     }
 
     if (totalTradeVolumeQuoted > p.maxTradeVolumeQuoted) {
       totalTradeVolumeQuoted = p.maxTradeVolumeQuoted;
 
       const times = totalTradeVolumeQuoted / p.deposit;
-      if (actualTimes > times) { actualTimes = times; }
+      if (actual > times) { actual = times; }
     }
 
     const leverage = {
       ...p.leverage,
-      actualTimes,
+      actual,
     };
     return {
       ...p,

@@ -27,7 +27,7 @@ describe('ZRisk', () => {
         maxTradeVolumeQuoted: 100000,
         leverage: {
           allow: true,
-          maxTimes: 3,
+          max: 3,
         },
         breakeven: { fee: .002 },
       };
@@ -320,7 +320,7 @@ describe('ZRisk', () => {
         maxTradeVolumeQuoted: 100000,
         leverage: {
           allow: true,
-          maxTimes: 3,
+          max: 3,
         },
         breakeven: { fee: .002 },
       };
@@ -653,7 +653,7 @@ describe('ZRisk', () => {
         maxTradeVolumeQuoted: +Infinity,
         leverage: {
           allow,
-          maxTimes: 100,
+          max: 100,
         },
       });
 
@@ -675,7 +675,7 @@ describe('ZRisk', () => {
       });
     });
 
-    describe('.leverage.actualTimes', () => {
+    describe('.leverage.actual', () => {
       const makeArgs = (preliminaryVolume: number): TradeVolumeManagementArgs => ({
         preliminaryVolume,
         deposit: 1000,
@@ -683,7 +683,7 @@ describe('ZRisk', () => {
         maxTradeVolumeQuoted: +Infinity,
         leverage: {
           allow: true,
-          maxTimes: 100,
+          max: 100,
         },
       });
       it('should be 1 in case trade volume doesn\'t requires leverage (can not be less 1)', () => {
@@ -692,7 +692,7 @@ describe('ZRisk', () => {
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(1);
+        expect(info.leverage.actual).to.eq(1);
         expect(info.totalTradeVolumeQuoted).to.eq(500);
       });
       it('should be calculated based on .totalTradeVolumeQuoted', () => {
@@ -701,38 +701,38 @@ describe('ZRisk', () => {
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(15);
+        expect(info.leverage.actual).to.eq(15);
         expect(info.totalTradeVolumeQuoted).to.eq(15000);
       });
     });
 
-    describe('.leverage.maxTimes', () => {
-      const makeArgs = (preliminaryVolume: number, maxTimes = 100): TradeVolumeManagementArgs => ({
+    describe('.leverage.max', () => {
+      const makeArgs = (preliminaryVolume: number, max = 100): TradeVolumeManagementArgs => ({
         preliminaryVolume,
         deposit: 1000,
         risk: .01,
         maxTradeVolumeQuoted: +Infinity,
         leverage: {
-          maxTimes,
+          max,
           allow: true,
         },
       });
-      it('should not touch in case .actualTimes <= .maxTimes', () => {
+      it('should not touch in case .actual <= .max', () => {
         // arrange
         const args = makeArgs(5000, 3);
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(3);
+        expect(info.leverage.actual).to.eq(3);
         expect(info.totalTradeVolumeQuoted).to.eq(3000);
       });
-      it('should limit .leverage.actualTimes and .totalTradeVolumeQuoted', () => {
+      it('should limit .leverage.actual and .totalTradeVolumeQuoted', () => {
         // arrange
         const args = makeArgs(5000, 7);
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(5);
+        expect(info.leverage.actual).to.eq(5);
         expect(info.totalTradeVolumeQuoted).to.eq(5000);
       });
     });
@@ -745,7 +745,7 @@ describe('ZRisk', () => {
         risk: .01,
         leverage: {
           allow: true,
-          maxTimes: 3,
+          max: 3,
         },
       });
       it('should not touch volume it less or equal .maxTradeVolumeQuoted', () => {
@@ -754,7 +754,7 @@ describe('ZRisk', () => {
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(2);
+        expect(info.leverage.actual).to.eq(2);
         expect(info.totalTradeVolumeQuoted).to.eq(2000);
       });
       it('should limit if preliminary volume bigger', () => {
@@ -763,7 +763,7 @@ describe('ZRisk', () => {
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(2.5);
+        expect(info.leverage.actual).to.eq(2.5);
         expect(info.totalTradeVolumeQuoted).to.eq(2500);
       });
       it('should have bigger priority then leverage preferences', () => {
@@ -772,16 +772,16 @@ describe('ZRisk', () => {
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(2.5);
+        expect(info.leverage.actual).to.eq(2.5);
         expect(info.totalTradeVolumeQuoted).to.eq(2500);
       });
-      it('should be limited by .leverage.maxTimes if the result of the limitation is less', () => {
+      it('should be limited by .leverage.max if the result of the limitation is less', () => {
         // arrange
         const args = makeArgs(4000, 3500);
         // act
         const info = zRisk.manageTradeVolume(args);
         // assert
-        expect(info.leverage.actualTimes).to.eq(3);
+        expect(info.leverage.actual).to.eq(3);
         expect(info.totalTradeVolumeQuoted).to.eq(3000);
       });
     });
