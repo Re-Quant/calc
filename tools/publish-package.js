@@ -7,7 +7,7 @@ checkMajorNodeVersion();
 const availableNpmTags = new Set(['latest', 'rc', 'dev']);
 const verRegEx = /^(?<base>\d+\.\d+\.\d+)(?:$|-(?<tag>\w+)\.(?<tagVersion>\d+)$)/;
 
-const root = path.join.bind(path, __dirname);
+const root = path.join.bind(path, __dirname, '..');
 const { env, isProd, isDev } = getEnv();
 
 const allVersions = getAllVersions();

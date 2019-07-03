@@ -9,7 +9,7 @@
   "types": "index.d.ts",
   "private": false,
   "scripts": {
-    "preinstall": "node tools/check-yarn.js",
+    "preinstall": "node ./tools/check-yarn.js",
     "webpack_": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
     "build:dev": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
     "build:prod": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.prod.js --progress --profile --bail",
