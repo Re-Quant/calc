@@ -9,6 +9,7 @@
   "types": "index.d.ts",
   "private": false,
   "scripts": {
+    "preinstall": "node tools/check-yarn.js",
     "webpack_": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
     "build:dev": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
     "build:prod": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.prod.js --progress --profile --bail",
@@ -16,7 +17,7 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "mochapack --include src/chai --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
     "test:watch": "npm run test -- --watch",
-    "publish_": "node ./publish-package.js",
+    "publish_": "node ./tools/publish-package.js",
     "publish:dev": "ENV=dev npm run publish_",
     "publish:prod": "ENV=prod npm run publish_",
     "npm:version:last-pushed": "npm view . version",
