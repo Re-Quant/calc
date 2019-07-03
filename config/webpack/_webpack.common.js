@@ -1,5 +1,4 @@
 const DefinePlugin = require('webpack/lib/DefinePlugin');
-const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const { root } = require('../helpers');
 
@@ -72,8 +71,6 @@ module.exports = (options) => {
         IS_ENV_PROD: JSON.stringify(options.env === 'production'),
         IS_ENV_TEST: JSON.stringify(options.env === 'test'),
       }),
-
-      new CheckerPlugin(),
     ],
 
     target: 'node',

@@ -1,5 +1,4 @@
 const webpackMerge = require('webpack-merge');
-const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const commonConfig = require('./_webpack.common');
 const testCommonConfig = require('./_webpack.test-common');
@@ -18,7 +17,6 @@ module.exports = function(options) {
   );
 
   config.resolve.extensions = config.resolve.extensions.filter(item => item !== '.ts');
-  config.module.rules = config.module.rules.filter(v => v.loader !== 'awesome-typescript-loader');
-  config.plugins = config.plugins.filter(v => !(v instanceof CheckerPlugin));
+  config.module.rules = config.module.rules.filter(v => v.loader !== 'ts-loader');
   return config;
 };
