@@ -131,17 +131,17 @@ describe('index.ts', () => {
         entries: [{
           price: 1000,
           fee: .001,
-          volumePart: 500,
+          volumePart: 1,
         }],
         stops: [{
           price: 1000,
           fee: .001,
-          volumePart: 500,
+          volumePart: 1,
         }],
         takes: [{
           price: 1000,
           fee: .001,
-          volumePart: 500,
+          volumePart: 1,
         }],
       };
     });
@@ -150,7 +150,7 @@ describe('index.ts', () => {
       const data: index.TradeOrderArg = {
         price: 1000,
         fee: .001,
-        volumePart: 500,
+        volumePart: 1,
       };
     });
 
