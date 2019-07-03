@@ -6,7 +6,7 @@ import {
   ETradeType,
   PriceAndVolumePart,
   TotalVolumeInfo,
-  TradeInfoArgs,
+  TradeInfoArgs, TradeOrderBase,
   TradeVolumeManagementArgs,
 } from './models';
 
@@ -130,22 +130,22 @@ describe('ZRisk', () => {
         // assert
 
         // check orders volume quoted
-        expect(entries[0].volumeQuoted /* ? */).to.roundEq(10000);
-        expect(stops[0].volumeQuoted /* ? */).to.roundEq(9000);
-        expect(takes[0].volumeQuoted /* ? */).to.roundEq(15000);
+        expect(entries[0].volume.order.quoted /* ? */).to.roundEq(10000);
+        expect(stops[0].volume.order.quoted /* ? */).to.roundEq(9000);
+        expect(takes[0].volume.order.quoted /* ? */).to.roundEq(15000);
 
         // check that orders base volume equals
-        expect(entries[0].volumeBase /* ? */).to.roundEq(1);
-        expect(entries[0].volumeBase).to.roundEq(stops[0].volumeBase);
-        expect(entries[0].volumeBase).to.roundEq(takes[0].volumeBase);
+        expect(entries[0].volume.order.base /* ? */).to.roundEq(1);
+        expect(entries[0].volume.order.base).to.roundEq(stops[0].volume.order.base);
+        expect(entries[0].volume.order.base).to.roundEq(takes[0].volume.order.base);
 
         // check all fees is zero
-        expect(entries[0].feeVolumeBase).to.equal(0);
-        expect(entries[0].feeVolumeQuoted).to.equal(0);
-        expect(stops[0].feeVolumeBase).to.equal(0);
-        expect(stops[0].feeVolumeQuoted).to.equal(0);
-        expect(takes[0].feeVolumeBase).to.equal(0);
-        expect(takes[0].feeVolumeQuoted).to.equal(0);
+        expect(entries[0].volume.fee.base).to.equal(0);
+        expect(entries[0].volume.fee.quoted).to.equal(0);
+        expect(stops[0].volume.fee.base).to.equal(0);
+        expect(stops[0].volume.fee.quoted).to.equal(0);
+        expect(takes[0].volume.fee.base).to.equal(0);
+        expect(takes[0].volume.fee.quoted).to.equal(0);
 
         // max profit & max loss
         expect(totalVolume.profitQuoted /* ? */).to.roundEq(5000);
@@ -240,6 +240,39 @@ describe('ZRisk', () => {
         expect(actualLossByBreakevenPrice).to.roundEq(0);
       });
 
+      it('should calculate summary volume with previous orders correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 6900, volumePart: .5,  fee: 0.002 },
+            { price: 6800, volumePart: .25, fee: 0.002 },
+            { price: 6500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 9000, volumePart: .25, fee: 0.002 },
+            { price: 9250, volumePart: .1,  fee: 0.001 },
+            { price: 9500, volumePart: .15, fee: 0.002 },
+            { price: 9900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { entries, stops, takes } = zRisk.getTradeInfo(args);
+
+        // assert
+        sumWithPreviousOrdersCheck(entries);
+        sumWithPreviousOrdersCheck(stops);
+        sumWithPreviousOrdersCheck(takes);
+      });
+
       function runLongIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -263,12 +296,13 @@ describe('ZRisk', () => {
 
           totalVolumeZeroCheck(tv);
 
-          expect(zMath.sumBy(entries, v => v.volumeQuoted)).to.roundEq(tv.entries.orders.quoted);
-          expect(zMath.sumBy(entries, v => v.volumeBase)).to.roundEq(tv.entries.orders.base);
-          expect(zMath.sumBy(stops, v => v.volumeQuoted)).to.roundEq(tv.stops.orders.quoted);
-          expect(zMath.sumBy(stops, v => v.volumeBase)).to.roundEq(tv.stops.orders.base);
-          expect(zMath.sumBy(takes, v => v.volumeQuoted)).to.roundEq(tv.takes.orders.quoted);
-          expect(zMath.sumBy(takes, v => v.volumeBase)).to.roundEq(tv.takes.orders.base);
+          expect(zMath.sumBy(entries, v => v.volume.order.quoted))
+            .to.roundEq(tv.entries.orders.quoted);
+          expect(zMath.sumBy(entries, v => v.volume.order.base)).to.roundEq(tv.entries.orders.base);
+          expect(zMath.sumBy(stops, v => v.volume.order.quoted)).to.roundEq(tv.stops.orders.quoted);
+          expect(zMath.sumBy(stops, v => v.volume.order.base)).to.roundEq(tv.stops.orders.base);
+          expect(zMath.sumBy(takes, v => v.volume.order.quoted)).to.roundEq(tv.takes.orders.quoted);
+          expect(zMath.sumBy(takes, v => v.volume.order.base)).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
           expect(tv.lossQuoted /* ? */).to.roundEq(vRiskExpected);
@@ -390,22 +424,22 @@ describe('ZRisk', () => {
         // assert
 
         // check orders volume base
-        expect(entries[0].volumeBase /* ? */).to.roundEq(1);
-        expect(stops[0].volumeBase /* ? */).to.roundEq(10000 / 11000);
-        expect(takes[0].volumeBase /* ? */).to.roundEq(10000 / 5000);
+        expect(entries[0].volume.order.base /* ? */).to.roundEq(1);
+        expect(stops[0].volume.order.base /* ? */).to.roundEq(10000 / 11000);
+        expect(takes[0].volume.order.base /* ? */).to.roundEq(10000 / 5000);
 
         // check that orders base volume equals
-        expect(entries[0].volumeQuoted /* ? */).to.roundEq(10000);
-        expect(entries[0].volumeQuoted /* ? */).to.roundEq(stops[0].volumeQuoted);
-        expect(entries[0].volumeQuoted /* ? */).to.roundEq(takes[0].volumeQuoted);
+        expect(entries[0].volume.order.quoted /* ? */).to.roundEq(10000);
+        expect(entries[0].volume.order.quoted /* ? */).to.roundEq(stops[0].volume.order.quoted);
+        expect(entries[0].volume.order.quoted /* ? */).to.roundEq(takes[0].volume.order.quoted);
 
         // check all fees is zero
-        expect(entries[0].feeVolumeBase).to.equal(0);
-        expect(entries[0].feeVolumeQuoted).to.equal(0);
-        expect(stops[0].feeVolumeBase).to.equal(0);
-        expect(stops[0].feeVolumeQuoted).to.equal(0);
-        expect(takes[0].feeVolumeBase).to.equal(0);
-        expect(takes[0].feeVolumeQuoted).to.equal(0);
+        expect(entries[0].volume.fee.base).to.equal(0);
+        expect(entries[0].volume.fee.quoted).to.equal(0);
+        expect(stops[0].volume.fee.base).to.equal(0);
+        expect(stops[0].volume.fee.quoted).to.equal(0);
+        expect(takes[0].volume.fee.base).to.equal(0);
+        expect(takes[0].volume.fee.quoted).to.equal(0);
 
         // max profit & max loss
         expect(totalVolume.profitQuoted /* ? */).to.roundEq(5000);
@@ -500,6 +534,39 @@ describe('ZRisk', () => {
         expect(actualLossByBreakevenPrice).to.roundEq(0);
       });
 
+      it('should calculate summary volume with previous orders correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { entries, stops, takes } = zRisk.getTradeInfo(args);
+
+        // assert
+        sumWithPreviousOrdersCheck(entries);
+        sumWithPreviousOrdersCheck(stops);
+        sumWithPreviousOrdersCheck(takes);
+      });
+
       function runShortIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -525,18 +592,35 @@ describe('ZRisk', () => {
 
           totalVolumeZeroCheck(tv);
 
-          expect(zMath.sumBy(entries, v => v.volumeQuoted)).to.roundEq(tv.entries.orders.quoted);
-          expect(zMath.sumBy(entries, v => v.volumeBase)).to.roundEq(tv.entries.orders.base);
-          expect(zMath.sumBy(stops, v => v.volumeQuoted)).to.roundEq(tv.stops.orders.quoted);
-          expect(zMath.sumBy(stops, v => v.volumeBase)).to.roundEq(tv.stops.orders.base);
-          expect(zMath.sumBy(takes, v => v.volumeQuoted)).to.roundEq(tv.takes.orders.quoted);
-          expect(zMath.sumBy(takes, v => v.volumeBase)).to.roundEq(tv.takes.orders.base);
+          expect(zMath.sumBy(entries, v => v.volume.order.quoted))
+            .to.roundEq(tv.entries.orders.quoted);
+          expect(zMath.sumBy(entries, v => v.volume.order.base)).to.roundEq(tv.entries.orders.base);
+          expect(zMath.sumBy(stops, v => v.volume.order.quoted)).to.roundEq(tv.stops.orders.quoted);
+          expect(zMath.sumBy(stops, v => v.volume.order.base)).to.roundEq(tv.stops.orders.base);
+          expect(zMath.sumBy(takes, v => v.volume.order.quoted)).to.roundEq(tv.takes.orders.quoted);
+          expect(zMath.sumBy(takes, v => v.volume.order.base)).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
           expect(tv.lossQuoted /* ? */).to.roundEq(vRiskExpected);
         });
       }
     }); // end Short Trade describe()
+
+    function sumWithPreviousOrdersCheck(orders: TradeOrderBase[]) {
+      const sum = {
+        orders: { quoted: 0, base: 0 },
+        fees:   { quoted: 0, base: 0 },
+      };
+
+      orders.forEach((o) => {
+        sum.orders.quoted += o.volume.order.quoted;
+        sum.orders.base   += o.volume.order.base;
+        sum.fees.quoted   += o.volume.fee.quoted;
+        sum.fees.base     += o.volume.fee.base;
+
+        expect(o.volume.sumWithPrev).to.deep.eq(sum);
+      });
+    }
 
     function totalVolumeZeroCheck(totalVolume: TotalVolumeInfo) {
       expect(totalVolume.lossQuoted /* ? */).to.be.greaterThan(0);

@@ -6,7 +6,7 @@ export {
   PriceAndVolumePart,
   TradeInfo,
   TradeInfoArgs,
-  TradeOrder,
+  TradeOrderBase,
   TradeOrderArg,
   TradeVolumeArgs,
   TradeVolumeManagement,

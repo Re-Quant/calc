@@ -10,12 +10,13 @@ import {
   PriceAndVolumePart,
   TradeInfo,
   TradeInfoArgs,
-  TradeOrder,
   TradeOrderArg,
+  TradeOrderBase,
   TradeTotalVolumeInfo,
   TradeVolumeArgs,
   TradeVolumeManagement,
   TradeVolumeManagementArgs,
+  Volume,
 } from './models';
 
 export class ZRisk {
@@ -179,9 +180,9 @@ export class ZRisk {
     const vSumTakesQ = this.math.sum(VtQ);
 
     // Fee & Totals by order type
-    const { orders: entries, fees: entryFees } = this.getOrdersGroupInfo(p.entries, VeQ, VeB, Fe);
-    const { orders: stops,   fees: stopFees }  = this.getOrdersGroupInfo(p.stops,   VsQ, VsB, Fs);
-    const { orders: takes,   fees: takeFees }  = this.getOrdersGroupInfo(p.takes,   VtQ, VtB, Ft);
+    const [entries, entryFees] = this.getOrdersGroupVolumes(p.entries, VeQ, VeB, Fe);
+    const [stops, stopFees]    = this.getOrdersGroupVolumes(p.stops,   VsQ, VsB, Fs);
+    const [takes, takeFees]    = this.getOrdersGroupVolumes(p.takes,   VtQ, VtB, Ft);
 
     // Total max loss and max profit
     const lossQuoted   = vSumEntriesQ - vSumStopsQ + entryFees.quoted + stopFees.quoted;
@@ -234,9 +235,9 @@ export class ZRisk {
     const vSumTakesB = this.math.sum(VtB); /* ? */
 
     // Fee & Totals by order type
-    const { orders: entries, fees: entryFees } = this.getOrdersGroupInfo(p.entries, VeQ, VeB, Fe);
-    const { orders: stops,   fees: stopFees }  = this.getOrdersGroupInfo(p.stops,   VsQ, VsB, Fs);
-    const { orders: takes,   fees: takeFees }  = this.getOrdersGroupInfo(p.takes,   VtQ, VtB, Ft);
+    const [entries, entryFees] = this.getOrdersGroupVolumes(p.entries, VeQ, VeB, Fe);
+    const [stops, stopFees]    = this.getOrdersGroupVolumes(p.stops,   VsQ, VsB, Fs);
+    const [takes, takeFees]    = this.getOrdersGroupVolumes(p.takes,   VtQ, VtB, Ft);
 
     // Total max loss and max profit
     const vSumLossQ = (vSumEntriesB - vSumStopsB) / this.math.sumBy(Is, (v, i) => v / Ps[i]);
@@ -268,28 +269,40 @@ export class ZRisk {
     };
   } // end getLongTradeOrdersInfo()
 
-  private getOrdersGroupInfo(
+  private getOrdersGroupVolumes(
     ordersArg: TradeOrderArg[],
     Vq: number[],
     Vb: number[],
     F: number[],
-  ): { orders: TradeOrder[]; } & Pick<TradeTotalVolumeInfo, 'fees'> {
+  ): [TradeOrderBase[], Volume] {
     const FvQ = Vq.map((v, i) => v * F[i]);
     const FvB = Vb.map((v, i) => v * F[i]);
 
-    const orders = ordersArg.map((order, i): TradeOrder => ({
-      ...order,
-      volumeQuoted:     Vq[i],
-      volumeBase:       Vb[i],
-      feeVolumeQuoted: FvQ[i],
-      feeVolumeBase:   FvB[i],
-    }));
+    let [sumOrdersQuoted, sumOrdersBase, sumFeesQuoted, sumFeesBase] = [0, 0, 0, 0];
+    const orders = ordersArg.map((order, i): TradeOrderBase => {
+      sumOrdersQuoted += Vq[i];
+      sumOrdersBase   += Vb[i];
+      sumFeesQuoted   += FvQ[i];
+      sumFeesBase     += FvB[i];
+
+      return {
+        ...order,
+        volume: {
+          sumWithPrev: {
+            orders: { quoted: sumOrdersQuoted, base: sumOrdersBase },
+            fees:   { quoted: sumFeesQuoted,   base: sumFeesBase },
+          },
+          order: { quoted:  Vq[i], base:  Vb[i] },
+          fee:   { quoted: FvQ[i], base: FvB[i] },
+        },
+      };
+    });
 
     const vSumFeeQ = this.math.sum(FvQ);
     const vSumFeeB = this.math.sum(FvB);
     const fees = { quoted: vSumFeeQ, base: vSumFeeB };
 
-    return { orders, fees };
+    return [orders, fees];
   }
 
   private flattenOrdersInfoArgs({ entries, stops, takes }: AllOrderGroups): FlattenOrdersGroups {

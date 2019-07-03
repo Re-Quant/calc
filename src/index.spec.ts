@@ -61,28 +61,40 @@ describe('index.ts', () => {
           price: 1000,
           fee: .001,
           volumePart: 1,
-          volumeBase: 1,
-          volumeQuoted: 1000,
-          feeVolumeBase: .0001,
-          feeVolumeQuoted: .1,
+          volume: {
+            order: { quoted: 1000, base: 1 },
+            fee:   { quoted: 1000, base: 1 },
+            sumWithPrev: {
+              orders: { quoted: 1000, base: 1 },
+              fees:   { quoted: 1000, base: 1 },
+            }
+          },
         }],
         stops: [{
           price: 1000,
           fee: .001,
           volumePart: 1,
-          volumeBase: 1,
-          volumeQuoted: 1000,
-          feeVolumeBase: .0001,
-          feeVolumeQuoted: .1,
+          volume: {
+            order: { quoted: 1000, base: 1 },
+            fee:   { quoted: 1000, base: 1 },
+            sumWithPrev: {
+              orders: { quoted: 1000, base: 1 },
+              fees:   { quoted: 1000, base: 1 },
+            }
+          },
         }],
         takes: [{
           price: 1000,
           fee: .001,
           volumePart: 1,
-          volumeBase: 1,
-          volumeQuoted: 1000,
-          feeVolumeBase: .0001,
-          feeVolumeQuoted: .1,
+          volume: {
+            order: { quoted: 1000, base: 1 },
+            fee:   { quoted: 1000, base: 1 },
+            sumWithPrev: {
+              orders: { quoted: 1000, base: 1 },
+              fees:   { quoted: 1000, base: 1 },
+            }
+          },
         }],
         totalVolume: {
           lossQuoted: 100,
@@ -134,7 +146,7 @@ describe('index.ts', () => {
       };
     });
 
-    it('TradeOrder should be exported', () => {
+    it('TradeOrderArg should be exported', () => {
       const data: index.TradeOrderArg = {
         price: 1000,
         fee: .001,
@@ -142,15 +154,19 @@ describe('index.ts', () => {
       };
     });
 
-    it('TradeOrderArg should be exported', () => {
-      const data: index.TradeOrder = {
+    it('TradeOrderBase should be exported', () => {
+      const data: index.TradeOrderBase = {
         price: 1000,
         fee: .001,
-        volumePart: 500,
-        volumeBase: 1,
-        volumeQuoted: 1000,
-        feeVolumeBase: .001,
-        feeVolumeQuoted: 1,
+        volumePart: 1,
+        volume: {
+          order: { quoted: 1000, base: 1 },
+          fee:   { quoted: 1000, base: 1 },
+          sumWithPrev: {
+            orders: { quoted: 1000, base: 1 },
+            fees:   { quoted: 1000, base: 1 },
+          }
+        },
       };
     });
 

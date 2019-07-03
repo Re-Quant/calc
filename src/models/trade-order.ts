@@ -1,3 +1,5 @@
+import { Volume } from './trade-total-volume';
+
 export interface PriceAndVolumePart {
   /** Price for the order execution */
   price: number;
@@ -8,18 +10,33 @@ export interface PriceAndVolumePart {
 export interface TradeOrderArg extends PriceAndVolumePart {
   /**
    * Fee for the order (percent 0..1)
-   * Notice: absolute fee doesn't support now
+   * @todo: implement absolute fee, it's no support now
    */
   fee: number;
 }
 
-export interface TradeOrder extends TradeOrderArg {
-  /** Volume for the order in Quoted units */
-  volumeQuoted: number;
-  /** Volume for the order in Base units */
-  volumeBase: number;
-  /** Fee Volume for the order in Quoted units */
-  feeVolumeQuoted: number;
-  /** Fee Volume for the order in Base units */
-  feeVolumeBase: number;
+interface TradeOrderVolume {
+  order: Volume;
+  fee: Volume;
+
+  sumWithPrev: {
+    orders: Volume;
+    fees: Volume;
+  };
 }
+
+export interface TradeOrderBase<T = TradeOrderVolume> extends TradeOrderArg {
+  volume: T;
+}
+
+// @todo: implement it
+// export interface TradeOrderStopAndTake extends TradeOrderEntry<TradeOrderVolume & {
+//   /**
+//    * Loss money in case the interface used for describe Stop Loss. Has minus sign.
+//    * Profit money in case the interface used for describe Take Profit. Has minus sign.
+//    */
+//   diff: {
+//     current: Volume & { percent: number };
+//     sumWithPrev: Volume & { percent: number };
+//   };
+// }> {}
