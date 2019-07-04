@@ -92,7 +92,7 @@ function publish(npmTag = 'latest') {
 }
 
 function saveNewVersionToDist(version) {
-  const originalPackageJson = require(root('package.json'));
+  const { scripts, devDependencies, ...originalPackageJson } = require(root('package.json'));
   const packageJson = { ...originalPackageJson, version };
   const packageJsonStr = JSON.stringify(packageJson, null, 2);
   fs.writeFileSync(root('dist', 'package.json'), packageJsonStr);
