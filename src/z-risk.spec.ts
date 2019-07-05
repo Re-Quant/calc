@@ -148,11 +148,11 @@ describe('ZRisk', () => {
         expect(takes[0].volume.fee.quoted).to.equal(0);
 
         // max profit & max loss
-        expect(totalVolume.profitQuoted /* ? */).to.roundEq(5000);
-        expect(totalVolume.lossQuoted /* ? */).to.roundEq(1000);
+        expect(totalVolume.profit.quoted /* ? */).to.roundEq(5000);
+        expect(totalVolume.loss.quoted /* ? */).to.roundEq(1000);
 
         // the main assertion
-        expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
+        expect(totalVolume.loss.quoted /* ? */).to.roundEq(vRiskExpected);
       });
 
       it('should calculate avg prices correctly', () => {
@@ -286,13 +286,15 @@ describe('ZRisk', () => {
                                  - tv.stops.orders.quoted
                                  + tv.entries.fees.quoted
                                  + tv.stops.fees.quoted; /* ? */
-          expect(vTotalLossQuoted).to.floatEq(tv.lossQuoted);
+          expect(vTotalLossQuoted).to.floatEq(tv.loss.quoted);
+          expect(vTotalLossQuoted / args.deposit).to.floatEq(tv.loss.percent);
 
           const vTotalProfitQuoted = tv.takes.orders.quoted
                                    - tv.entries.orders.quoted
                                    - tv.takes.fees.quoted
                                    - tv.entries.fees.quoted;  /* ? */
-          expect(vTotalProfitQuoted).to.floatEq(tv.profitQuoted);
+          expect(vTotalProfitQuoted).to.floatEq(tv.profit.quoted);
+          expect(vTotalProfitQuoted / args.deposit).to.floatEq(tv.profit.percent);
 
           totalVolumeZeroCheck(tv);
 
@@ -305,7 +307,7 @@ describe('ZRisk', () => {
           expect(zMath.sumBy(takes, v => v.volume.order.base)).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
-          expect(tv.lossQuoted /* ? */).to.roundEq(vRiskExpected);
+          expect(tv.loss.quoted /* ? */).to.roundEq(vRiskExpected);
         });
       }
 
@@ -442,11 +444,11 @@ describe('ZRisk', () => {
         expect(takes[0].volume.fee.quoted).to.equal(0);
 
         // max profit & max loss
-        expect(totalVolume.profitQuoted /* ? */).to.roundEq(5000);
-        expect(totalVolume.lossQuoted /* ? */).to.roundEq(1000);
+        expect(totalVolume.profit.quoted /* ? */).to.roundEq(5000);
+        expect(totalVolume.loss.quoted /* ? */).to.roundEq(1000);
 
         // the main assertion
-        expect(totalVolume.lossQuoted /* ? */).to.roundEq(vRiskExpected);
+        expect(totalVolume.loss.quoted /* ? */).to.roundEq(vRiskExpected);
       });
 
       it('should calculate avg prices correctly', () => {
@@ -582,13 +584,15 @@ describe('ZRisk', () => {
                                  * pAvgStop
                                  + tv.entries.fees.quoted
                                  + tv.stops.fees.quoted; /* ? */
-          expect(vTotalLossQuoted).to.roundEq(tv.lossQuoted, 14);
+          expect(vTotalLossQuoted).to.roundEq(tv.loss.quoted);
+          expect(vTotalLossQuoted / args.deposit).to.roundEq(tv.loss.percent);
 
           const vTotalProfitQuoted = (tv.takes.orders.base - tv.entries.orders.base)
                                    * pAvgTake
                                    - tv.takes.fees.quoted
                                    - tv.entries.fees.quoted;  /* ? */
-          expect(vTotalProfitQuoted).to.floatEq(tv.profitQuoted);
+          expect(vTotalProfitQuoted).to.floatEq(tv.profit.quoted);
+          expect(vTotalProfitQuoted / args.deposit).to.floatEq(tv.profit.percent);
 
           totalVolumeZeroCheck(tv);
 
@@ -601,7 +605,7 @@ describe('ZRisk', () => {
           expect(zMath.sumBy(takes, v => v.volume.order.base)).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
-          expect(tv.lossQuoted /* ? */).to.roundEq(vRiskExpected);
+          expect(tv.loss.quoted /* ? */).to.roundEq(vRiskExpected);
         });
       }
     }); // end Short Trade describe()
@@ -623,8 +627,10 @@ describe('ZRisk', () => {
     }
 
     function totalVolumeZeroCheck(totalVolume: TotalVolumeInfo) {
-      expect(totalVolume.lossQuoted /* ? */).to.be.greaterThan(0);
-      expect(totalVolume.profitQuoted /* ? */).to.be.greaterThan(0);
+      expect(totalVolume.loss.quoted /* ? */).to.be.greaterThan(0);
+      expect(totalVolume.loss.percent /* ? */).to.be.greaterThan(0);
+      expect(totalVolume.profit.quoted /* ? */).to.be.greaterThan(0);
+      expect(totalVolume.profit.percent /* ? */).to.be.greaterThan(0);
 
       expect(totalVolume.entries.orders.quoted /* ? */).to.be.greaterThan(0);
       expect(totalVolume.entries.orders.base /* ? */).to.be.greaterThan(0);

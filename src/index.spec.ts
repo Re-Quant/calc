@@ -97,8 +97,8 @@ describe('index.ts', () => {
           },
         }],
         totalVolume: {
-          lossQuoted: 100,
-          profitQuoted: 1000,
+          loss: { quoted: 100, percent: .001 },
+          profit: { quoted: 500, percent: .005 },
           entries: {
             fees:   { base: 1, quoted: 10 },
             orders: { base: 10, quoted: 1000 },

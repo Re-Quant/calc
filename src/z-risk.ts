@@ -12,7 +12,6 @@ import {
   TradeInfoArgs,
   TradeOrderArg,
   TradeOrderBase,
-  TradeTotalVolumeInfo,
   TradeVolumeArgs,
   TradeVolumeManagement,
   TradeVolumeManagementArgs,
@@ -193,8 +192,8 @@ export class ZRisk {
       stops,
       takes,
       totalVolume: {
-        lossQuoted,
-        profitQuoted,
+        loss: { quoted: lossQuoted, percent: lossQuoted / p.deposit },
+        profit: { quoted: profitQuoted, percent: profitQuoted / p.deposit },
         entries: {
           orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
           fees: entryFees,
@@ -251,8 +250,8 @@ export class ZRisk {
       stops,
       takes,
       totalVolume: {
-        lossQuoted,
-        profitQuoted,
+        loss: { quoted: lossQuoted, percent: lossQuoted / p.deposit },
+        profit: { quoted: profitQuoted, percent: profitQuoted / p.deposit },
         entries: {
           orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
           fees: entryFees,

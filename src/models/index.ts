@@ -2,6 +2,7 @@ export * from './avg-prices';
 export * from './trade-type.enum';
 export * from './order-groups';
 export * from './orders-info';
+export * from './quoted-diff';
 export * from './trade-info';
 export * from './trade-order';
 export * from './trade-total-volume';

@@ -1,3 +1,5 @@
+import { QuotedDiff } from './quoted-diff';
+
 export interface Volume {
   quoted: number;
   base: number;
@@ -9,8 +11,8 @@ export interface TradeTotalVolumeInfo {
 }
 
 export interface TotalVolumeInfo {
-  lossQuoted: number;
-  profitQuoted: number;
+  loss: QuotedDiff;
+  profit: QuotedDiff;
   entries: TradeTotalVolumeInfo;
   stops: TradeTotalVolumeInfo;
   takes: TradeTotalVolumeInfo;
