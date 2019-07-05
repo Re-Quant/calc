@@ -6,8 +6,8 @@ export interface Volume {
 }
 
 export interface TradeTotalVolumeInfo {
-  orders: { quoted: number; base: number };
-  fees: { quoted: number; base: number };
+  orders: Volume & QuotedDiff;
+  fees: Volume;
 }
 
 export interface TotalVolumeInfo {

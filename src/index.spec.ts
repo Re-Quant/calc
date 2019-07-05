@@ -101,15 +101,15 @@ describe('index.ts', () => {
           profit: { quoted: 500, percent: .005 },
           entries: {
             fees:   { base: 1, quoted: 10 },
-            orders: { base: 10, quoted: 1000 },
+            orders: { base: 10, quoted: 1000, percent: .009 },
           },
           stops: {
             fees:   { base: 1, quoted: 10 },
-            orders: { base: 10, quoted: 1000 },
+            orders: { base: 10, quoted: 1000, percent: .002 },
           },
           takes: {
             fees:   { base: 1, quoted: 10 },
-            orders: { base: 10, quoted: 1000 },
+            orders: { base: 10, quoted: 1000, percent: .01 },
           },
         },
       };

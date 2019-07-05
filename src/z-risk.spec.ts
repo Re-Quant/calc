@@ -273,6 +273,39 @@ describe('ZRisk', () => {
         sumWithPreviousOrdersCheck(takes);
       });
 
+      it('should calculate percentages of deposit in total volumes correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { totalVolume: { entries, stops, takes } } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(entries.orders.percent).to.floatEq(entries.orders.quoted / args.deposit);
+        expect(stops.orders.percent).to.floatEq(stops.orders.quoted / args.deposit);
+        expect(takes.orders.percent).to.floatEq(takes.orders.quoted / args.deposit);
+      });
+
       function runLongIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -567,6 +600,39 @@ describe('ZRisk', () => {
         sumWithPreviousOrdersCheck(entries);
         sumWithPreviousOrdersCheck(stops);
         sumWithPreviousOrdersCheck(takes);
+      });
+
+      it('should calculate percentages of deposit in total volumes correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { totalVolume: { entries, stops, takes } } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(entries.orders.percent).to.floatEq(entries.orders.quoted / args.deposit);
+        expect(stops.orders.percent).to.floatEq(stops.orders.quoted / args.deposit);
+        expect(takes.orders.percent).to.floatEq(takes.orders.quoted / args.deposit);
       });
 
       function runShortIt(message: string, args: TradeInfoArgs) {

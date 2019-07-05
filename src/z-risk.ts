@@ -195,15 +195,15 @@ export class ZRisk {
         loss: { quoted: lossQuoted, percent: lossQuoted / p.deposit },
         profit: { quoted: profitQuoted, percent: profitQuoted / p.deposit },
         entries: {
-          orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
+          orders: { quoted: vSumEntriesQ, base: vSumEntriesB, percent: vSumEntriesQ / p.deposit },
           fees: entryFees,
         },
         stops: {
-          orders: { quoted: vSumStopsQ, base: vSumStopsB, },
+          orders: { quoted: vSumStopsQ, base: vSumStopsB, percent: vSumStopsQ / p.deposit  },
           fees: stopFees,
         },
         takes: {
-          orders: { quoted: vSumTakesQ, base: vSumTakesB, },
+          orders: { quoted: vSumTakesQ, base: vSumTakesB, percent: vSumTakesQ / p.deposit  },
           fees: takeFees,
         },
       },
@@ -253,15 +253,15 @@ export class ZRisk {
         loss: { quoted: lossQuoted, percent: lossQuoted / p.deposit },
         profit: { quoted: profitQuoted, percent: profitQuoted / p.deposit },
         entries: {
-          orders: { quoted: vSumEntriesQ, base: vSumEntriesB, },
+          orders: { quoted: vSumEntriesQ, base: vSumEntriesB, percent: vSumEntriesQ / p.deposit },
           fees: entryFees,
         },
         stops: {
-          orders: { quoted: vSumStopsQ, base: vSumStopsB, },
+          orders: { quoted: vSumStopsQ, base: vSumStopsB, percent: vSumStopsQ / p.deposit  },
           fees: stopFees,
         },
         takes: {
-          orders: { quoted: vSumTakesQ, base: vSumTakesB, },
+          orders: { quoted: vSumTakesQ, base: vSumTakesB, percent: vSumTakesQ / p.deposit  },
           fees: takeFees,
         },
       },
