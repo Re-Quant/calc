@@ -27,6 +27,12 @@ export interface LeverageInfoArgs {
 export interface LeverageInfo extends LeverageInfoArgs {
   /** Actual leverage quantity after final trade sum calculated */
   actual: number;
+
+  /**
+   * Order liquidation price.
+   * Notice: undefined if the Leverage is not used
+   */
+  marginCallPrice?: number;
 }
 
 export interface TradeVolumeArgs<T = TradeOrderArg>

@@ -10,6 +10,9 @@ import {
   TradeVolumeManagementArgs,
 } from './models';
 
+// @todo: Make common data sets
+// @todo: Make trusty calculated data sets
+
 describe('ZRisk', () => {
   let zRisk: ZRisk;
 
@@ -304,6 +307,37 @@ describe('ZRisk', () => {
         expect(entries.orders.percent).to.floatEq(entries.orders.quoted / args.deposit);
         expect(stops.orders.percent).to.floatEq(stops.orders.quoted / args.deposit);
         expect(takes.orders.percent).to.floatEq(takes.orders.quoted / args.deposit);
+      });
+
+      it('should calculate risk ratio', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { totalVolume: { riskRatio, profit, loss } } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(riskRatio).to.floatEq(profit.quoted / loss.quoted);
       });
 
       function runLongIt(message: string, args: TradeInfoArgs) {
@@ -635,6 +669,37 @@ describe('ZRisk', () => {
         expect(takes.orders.percent).to.floatEq(takes.orders.quoted / args.deposit);
       });
 
+      it('should calculate risk ratio', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { totalVolume: { riskRatio, profit, loss } } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(riskRatio).to.floatEq(profit.quoted / loss.quoted);
+      });
+
       function runShortIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -806,6 +871,26 @@ describe('ZRisk', () => {
         // assert
         expect(info.leverage.actual).to.eq(5);
         expect(info.totalTradeVolumeQuoted).to.eq(5000);
+      });
+    });
+
+    describe('.marginCallPrice', () => {
+      it('should calculate the Margin Call Price for Long trade', () => {
+        // @todo: Implement it
+        // arrange
+
+        // act
+
+        // assert
+      });
+
+      it('should calculate the Margin Call Price for Short trade', () => {
+        // @todo: Implement it
+        // arrange
+
+        // act
+
+        // assert
       });
     });
 

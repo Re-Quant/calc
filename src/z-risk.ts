@@ -82,6 +82,7 @@ export class ZRisk {
     const leverage = {
       ...p.leverage,
       actual,
+      marginCallPrice: 1024, // mocked data. TODO: Implement it
     };
     return {
       ...p,
@@ -194,6 +195,7 @@ export class ZRisk {
       totalVolume: {
         loss: { quoted: lossQuoted, percent: lossQuoted / p.deposit },
         profit: { quoted: profitQuoted, percent: profitQuoted / p.deposit },
+        riskRatio: profitQuoted / lossQuoted,
         entries: {
           orders: { quoted: vSumEntriesQ, base: vSumEntriesB, percent: vSumEntriesQ / p.deposit },
           fees: entryFees,
@@ -252,6 +254,7 @@ export class ZRisk {
       totalVolume: {
         loss: { quoted: lossQuoted, percent: lossQuoted / p.deposit },
         profit: { quoted: profitQuoted, percent: profitQuoted / p.deposit },
+        riskRatio: profitQuoted / lossQuoted,
         entries: {
           orders: { quoted: vSumEntriesQ, base: vSumEntriesB, percent: vSumEntriesQ / p.deposit },
           fees: entryFees,

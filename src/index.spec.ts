@@ -45,6 +45,7 @@ describe('index.ts', () => {
           allow:  true,
           max: 10,
           actual: 2.2,
+          marginCallPrice: 1000,
         },
         maxTradeVolumeQuoted: 10000,
         tradeType: ETradeType.Long,
@@ -99,6 +100,7 @@ describe('index.ts', () => {
         totalVolume: {
           loss: { quoted: 100, percent: .001 },
           profit: { quoted: 500, percent: .005 },
+          riskRatio: 500 / 100,
           entries: {
             fees:   { base: 1, quoted: 10 },
             orders: { base: 10, quoted: 1000, percent: .009 },
