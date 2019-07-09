@@ -1,5 +1,5 @@
 import { TradeVolumeArgs, TradeVolumeCommonInfo, TradeVolumeCommonInfoArgs } from './trade-volume';
-import { TradeOrderArg, TradeOrderBase } from './trade-order';
+import { TradeOrder, TradeOrderArg } from './trade-order';
 import { OrdersInfo } from './orders-info';
 import { TakeOrderGroup } from './order-groups';
 import { TradeTypeInfo } from './trade-type.enum';
@@ -8,7 +8,7 @@ import { BreakevenTradeInfo, BreakevenTradeInfoArgs } from './breakeven';
 
 export interface TradeInfo
   extends
-    TradeVolumeArgs<TradeOrderBase>,
+    TradeVolumeArgs<TradeOrder>,
     OrdersInfo,
     TradeVolumeCommonInfo,
     TradeTypeInfo,

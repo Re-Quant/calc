@@ -1,5 +1,5 @@
 import { AllOrderGroups, FlattenOrdersGroups } from './order-groups';
-import { TradeOrderArg, TradeOrderBase } from './trade-order';
+import { TradeOrder, TradeOrderArg } from './trade-order';
 import { TotalVolumeInfo } from './trade-total-volume';
 
 export interface OrdersInfoArg<T = TradeOrderArg> extends AllOrderGroups<T> {
@@ -9,6 +9,6 @@ export interface OrdersInfoArg<T = TradeOrderArg> extends AllOrderGroups<T> {
   flattenOrderGroups: FlattenOrdersGroups;
 }
 
-export interface OrdersInfo extends AllOrderGroups<TradeOrderBase> {
+export interface OrdersInfo extends AllOrderGroups<TradeOrder> {
   totalVolume: TotalVolumeInfo;
 }

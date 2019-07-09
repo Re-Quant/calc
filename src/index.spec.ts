@@ -68,7 +68,11 @@ describe('index.ts', () => {
             sumWithPrev: {
               orders: { quoted: 1000, base: 1 },
               fees:   { quoted: 1000, base: 1 },
-            }
+            },
+            diff: {
+              current: { quoted: 1000, percent: 0.5 },
+              total: { quoted: 1000, percent: 0.5 },
+            },
           },
         }],
         stops: [{
@@ -81,7 +85,11 @@ describe('index.ts', () => {
             sumWithPrev: {
               orders: { quoted: 1000, base: 1 },
               fees:   { quoted: 1000, base: 1 },
-            }
+            },
+            diff: {
+              current: { quoted: 1000, percent: 0.5 },
+              total: { quoted: 1000, percent: 0.5 },
+            },
           },
         }],
         takes: [{
@@ -94,7 +102,11 @@ describe('index.ts', () => {
             sumWithPrev: {
               orders: { quoted: 1000, base: 1 },
               fees:   { quoted: 1000, base: 1 },
-            }
+            },
+            diff: {
+              current: { quoted: 1000, percent: 0.5 },
+              total: { quoted: 1000, percent: 0.5 },
+            },
           },
         }],
         totalVolume: {
@@ -157,7 +169,7 @@ describe('index.ts', () => {
     });
 
     it('TradeOrderBase should be exported', () => {
-      const data: index.TradeOrderBase = {
+      const data: index.TradeOrder = {
         price: 1000,
         fee: .001,
         volumePart: 1,
@@ -167,7 +179,11 @@ describe('index.ts', () => {
           sumWithPrev: {
             orders: { quoted: 1000, base: 1 },
             fees:   { quoted: 1000, base: 1 },
-          }
+          },
+          diff: {
+            current: { quoted: 1000, percent: 0.5 },
+            total: { quoted: 1000, percent: 0.5 },
+          },
         },
       };
     });

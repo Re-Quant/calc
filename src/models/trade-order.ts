@@ -1,4 +1,5 @@
 import { Volume } from './trade-total-volume';
+import { QuotedDiff } from './quoted-diff';
 
 export interface PriceAndVolumePart {
   /** Price for the order execution */
@@ -29,14 +30,22 @@ export interface TradeOrderBase<T = TradeOrderVolume> extends TradeOrderArg {
   volume: T;
 }
 
-// @todo: implement it
-// export interface TradeOrderStopAndTake extends TradeOrderEntry<TradeOrderVolume & {
-//   /**
-//    * Loss money in case the interface used for describe Stop Loss. Has minus sign.
-//    * Profit money in case the interface used for describe Take Profit. Has minus sign.
-//    */
-//   diff: {
-//     current: Volume & { percent: number };
-//     sumWithPrev: Volume & { percent: number };
-//   };
-// }> {}
+export interface TradeOrder extends TradeOrderBase<TradeOrderVolume & {
+  /**
+   * Deposit change difference.
+   *
+   * There is 3 cases:
+   * - Stop Losses:  Lost money. Has minus sign.
+   * - Entries:      Lost money(because of fee, zero in case no fee). Has minus sign.
+   * - Take Profits: Earned money. Has plus sign.
+   */
+  diff: {
+    /** Loss or Profit in this order plus fee of this order */
+    current: QuotedDiff;
+    /**
+     * Total loss or Profit or this order with fee of this order and volumes of all previously
+     * executed orders and it fees
+     */
+    total: QuotedDiff;
+  };
+}> {}
