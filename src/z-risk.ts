@@ -188,44 +188,25 @@ export class ZRisk {
     const lossQuoted   = vSumEntriesQ - vSumStopsQ + entryFees.quoted + stopFees.quoted;
     const profitQuoted = vSumTakesQ - vSumEntriesQ - takeFees.quoted - entryFees.quoted;
 
-    // @todo: move diff calculation out from here
-    // -----------------------------------------
-    let totalQuoted = 0;
-    const entries = entriesBase.map((o): TradeOrder => {
-      const quoted  = -1 * o.volume.fee.quoted;
-      totalQuoted += quoted;
-
-      const diff = {
-        current: { quoted, percent: quoted / p.deposit },
-        total: { quoted: totalQuoted, percent: totalQuoted / p.deposit },
-      };
-      return { ...o, volume: { ...o.volume, diff } };
-    });
-
-    totalQuoted = -1 * entryFees.quoted;
-    const stops = stopsBase.map((o): TradeOrder => {
-      const quoted = (o.volume.order.quoted - vSumEntriesQ * o.volumePart) - o.volume.fee.quoted;
-      totalQuoted += quoted;
-
-      const diff = {
-        current: { quoted, percent: quoted / p.deposit },
-        total: { quoted: totalQuoted, percent: totalQuoted / p.deposit },
-      };
-      return { ...o, volume: { ...o.volume, diff } };
-    });
-
-    totalQuoted = -1 * entryFees.quoted;
-    const takes = takesBase.map((o): TradeOrder => {
-      const quoted = (o.volume.order.quoted - vSumEntriesQ * o.volumePart) - o.volume.fee.quoted;
-      totalQuoted += quoted;
-
-      const diff = {
-        current: { quoted, percent: quoted / p.deposit },
-        total: { quoted: totalQuoted, percent: totalQuoted / p.deposit },
-      };
-      return { ...o, volume: { ...o.volume, diff } };
-    });
-    // -----------------------------------------
+    // Diff's calculation
+    const entries = this.addDiffToTradeOrdersGroup(
+      entriesBase,
+      o => -1 * o.volume.fee.quoted,
+      0,
+      p.deposit
+    );
+    const stops = this.addDiffToTradeOrdersGroup(
+      stopsBase,
+      o => (o.volume.order.quoted - vSumEntriesQ * o.volumePart) - o.volume.fee.quoted,
+      -1 * entryFees.quoted,
+      p.deposit,
+    );
+    const takes = this.addDiffToTradeOrdersGroup(
+      takesBase,
+      o => (o.volume.order.quoted - vSumEntriesQ * o.volumePart) - o.volume.fee.quoted,
+      -1 * entryFees.quoted,
+      p.deposit,
+    );
 
     return {
       entries,
@@ -286,47 +267,25 @@ export class ZRisk {
     const vSumProfitQ = this.math.sumBy(It, (v, i) => (VtB[i] - vSumEntriesB * v) * Pt[i]);
     const profitQuoted = vSumProfitQ - takeFees.quoted - entryFees.quoted;
 
-    // @todo: move diff calculation out from here
-    // -----------------------------------------
-    let totalQuoted = 0;
-    const entries = entriesBase.map((o): TradeOrder => {
-      const quoted  = -1 * o.volume.fee.quoted;
-      totalQuoted += quoted;
-
-      const diff = {
-        current: { quoted, percent: quoted / p.deposit },
-        total: { quoted: totalQuoted, percent: totalQuoted / p.deposit },
-      };
-      return { ...o, volume: { ...o.volume, diff } };
-    });
-
-    totalQuoted = -1 * entryFees.quoted;
-    const stops = stopsBase.map((o): TradeOrder => {
-      const quoted = (o.volume.order.base - vSumEntriesB * o.volumePart) * o.price
-                   - o.volume.fee.quoted;
-      totalQuoted += quoted;
-
-      const diff = {
-        current: { quoted, percent: quoted / p.deposit },
-        total: { quoted: totalQuoted, percent: totalQuoted / p.deposit },
-      };
-      return { ...o, volume: { ...o.volume, diff } };
-    });
-
-    totalQuoted = -1 * entryFees.quoted;
-    const takes = takesBase.map((o): TradeOrder => {
-      // const quoted = (o.volume.order.quoted - vSumEntriesB * o.volumePart * o.price)
-      const quoted = (o.volume.order.base - vSumEntriesB * o.volumePart) * o.price
-                   - o.volume.fee.quoted;
-      totalQuoted += quoted;
-
-      const diff = {
-        current: { quoted, percent: quoted / p.deposit },
-        total: { quoted: totalQuoted, percent: totalQuoted / p.deposit },
-      };
-      return { ...o, volume: { ...o.volume, diff } };
-    });
-    // -----------------------------------------
+    // Diff's calculation
+    const entries = this.addDiffToTradeOrdersGroup(
+      entriesBase,
+      o => -1 * o.volume.fee.quoted,
+      0,
+      p.deposit
+    );
+    const stops = this.addDiffToTradeOrdersGroup(
+      stopsBase,
+      o => (o.volume.order.base - vSumEntriesB * o.volumePart) * o.price - o.volume.fee.quoted,
+      -1 * entryFees.quoted,
+      p.deposit,
+    );
+    const takes = this.addDiffToTradeOrdersGroup(
+      takesBase,
+      o => (o.volume.order.base - vSumEntriesB * o.volumePart) * o.price - o.volume.fee.quoted,
+      -1 * entryFees.quoted,
+      p.deposit,
+    );
 
     return {
       entries,
@@ -351,6 +310,31 @@ export class ZRisk {
       },
     };
   } // end getShortTradeOrdersInfo()
+
+  private addDiffToTradeOrdersGroup(
+    orders: TradeOrderBase[],
+    cb: (o: TradeOrderBase) => number,
+    initial: number,
+    deposit: number,
+  ): TradeOrder[] {
+    let totalQuoted = initial;
+
+    return orders.map((o): TradeOrder => {
+      const quoted = cb(o);
+      totalQuoted += quoted;
+
+      return {
+        ...o,
+        volume: {
+          ...o.volume,
+          diff: {
+            current: { quoted, percent: quoted / deposit },
+            total:   { quoted: totalQuoted, percent: totalQuoted / deposit },
+          },
+        },
+      };
+    });
+  }
 
   private getOrdersGroupVolumes(
     ordersArg: TradeOrderArg[],
