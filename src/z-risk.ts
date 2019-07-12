@@ -47,11 +47,11 @@ export class ZRisk {
     const vRisk = deposit * risk;
 
     const x  = this.math.sumBy(entries, v => v.volumePart / v.price);
-    const y  = this.math.sumBy(stops,   v => v.volumePart / v.price);
+    const y  = this.math.sumBy(stops,   v => v.volumePart * v.price);
     const fe = this.math.sumBy(entries, v => v.volumePart * v.fee);
     const fs = this.math.sumBy(stops,   v => v.volumePart * v.fee);
 
-    return vRisk / (x / y - 1 + fe + fs); // vSumEntriesQ
+    return vRisk / (x * y + fe + fs - 1); // vSumEntriesQ
   }
 
   public manageTradeVolume(
@@ -280,14 +280,10 @@ export class ZRisk {
     const [takesBase, takeFees]    = this.getOrdersGroupVolumes(p.takes,   VtQ, VtB, Ft);
 
     // Total max loss and max profit
-    const vSumLossQ = (vSumEntriesB - vSumStopsB) / this.math.sumBy(Is, (v, i) => v / Ps[i]);
-    // @todo: use correctly calculation
-    // const vSumLossQ = this.math.sumBy(Is, (v, i) => (vSumEntriesB * v - VsB[i]) * Ps[i]);
+    const vSumLossQ = this.math.sumBy(Is, (v, i) => (vSumEntriesB * v - VsB[i]) * Ps[i]);
     const lossQuoted   = vSumLossQ + entryFees.quoted + stopFees.quoted;
 
-    const vSumProfitQ = (vSumTakesB - vSumEntriesB) / this.math.sumBy(It, (v, i) => v / Pt[i]);
-    // @todo: use correctly calculation
-    // const vSumProfitQ = this.math.sumBy(It, (v, i) => (vSumEntriesB * v - VtB[i]) * Pt[i]);
+    const vSumProfitQ = this.math.sumBy(It, (v, i) => (VtB[i] - vSumEntriesB * v) * Pt[i]);
     const profitQuoted = vSumProfitQ - takeFees.quoted - entryFees.quoted;
 
     // @todo: move diff calculation out from here

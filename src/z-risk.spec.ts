@@ -435,13 +435,13 @@ describe('ZRisk', () => {
 
           totalVolumeZeroCheck(tv);
 
-          expect(zMath.sumBy(entries, v => v.volume.order.quoted))
-            .to.roundEq(tv.entries.orders.quoted);
-          expect(zMath.sumBy(entries, v => v.volume.order.base)).to.roundEq(tv.entries.orders.base);
-          expect(zMath.sumBy(stops, v => v.volume.order.quoted)).to.roundEq(tv.stops.orders.quoted);
-          expect(zMath.sumBy(stops, v => v.volume.order.base)).to.roundEq(tv.stops.orders.base);
-          expect(zMath.sumBy(takes, v => v.volume.order.quoted)).to.roundEq(tv.takes.orders.quoted);
-          expect(zMath.sumBy(takes, v => v.volume.order.base)).to.roundEq(tv.takes.orders.base);
+          const s = zMath.sumBy.bind(zMath);
+          expect(s(entries, v => v.volume.order.quoted)).to.roundEq(tv.entries.orders.quoted);
+          expect(s(entries, v => v.volume.order.base  )).to.roundEq(tv.entries.orders.base);
+          expect(s(stops,   v => v.volume.order.quoted)).to.roundEq(tv.stops.orders.quoted);
+          expect(s(stops,   v => v.volume.order.base  )).to.roundEq(tv.stops.orders.base);
+          expect(s(takes,   v => v.volume.order.quoted)).to.roundEq(tv.takes.orders.quoted);
+          expect(s(takes,   v => v.volume.order.base  )).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
           expect(tv.loss.quoted /* ? */).to.roundEq(vRiskExpected);
@@ -835,45 +835,51 @@ describe('ZRisk', () => {
 
         // comparing with already known volume totals
         expect(entries[2].volume.diff.total.quoted).to.roundEq(tv.entries.fees.quoted * -1);
-        // @todo: fix errors
-        // expect(stops[2].volume.diff.total.quoted).to.roundEq(tv.loss.quoted * -1, 7);
-        // expect(takes[3].volume.diff.total.quoted).to.roundEq(tv.profit.quoted, 8);
+        expect(stops[2].volume.diff.total.quoted).to.roundEq(tv.loss.quoted * -1);
+        expect(takes[3].volume.diff.total.quoted).to.roundEq(tv.profit.quoted);
       });
 
       function runShortIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
           const vRiskExpected = args.deposit * args.risk;  /* ? */
-          const pAvgStop = 1 / zMath.sumBy(args.stops, v => v.volumePart / v.price);
-          const pAvgTake = 1 / zMath.sumBy(args.takes, v => v.volumePart / v.price);
 
           // act
           const { totalVolume: tv, entries, stops, takes } = zRisk.getTradeInfo(args);  /* ? */
 
           // assert
-          const vTotalLossQuoted = (tv.entries.orders.base - tv.stops.orders.base)
-                                 * pAvgStop
+
+          const lossNoFee = tv.entries.orders.quoted * (
+              zMath.sumBy(entries, v => v.volumePart / v.price)
+            * zMath.sumBy(stops,   v => v.volumePart * v.price)
+            - 1
+          );
+          const vTotalLossQuoted = lossNoFee
                                  + tv.entries.fees.quoted
                                  + tv.stops.fees.quoted; /* ? */
           expect(vTotalLossQuoted).to.roundEq(tv.loss.quoted);
           expect(vTotalLossQuoted / args.deposit).to.roundEq(tv.loss.percent);
 
-          const vTotalProfitQuoted = (tv.takes.orders.base - tv.entries.orders.base)
-                                   * pAvgTake
+          const profitNoFee = tv.stops.orders.quoted * (
+              1
+            - zMath.sumBy(entries, v => v.volumePart / v.price)
+            * zMath.sumBy(takes,   v => v.volumePart * v.price)
+          ); /* ? */
+          const vTotalProfitQuoted = profitNoFee
                                    - tv.takes.fees.quoted
                                    - tv.entries.fees.quoted;  /* ? */
-          expect(vTotalProfitQuoted).to.floatEq(tv.profit.quoted);
+          expect(vTotalProfitQuoted).to.roundEq(tv.profit.quoted);
           expect(vTotalProfitQuoted / args.deposit).to.floatEq(tv.profit.percent);
 
           totalVolumeZeroCheck(tv);
 
-          expect(zMath.sumBy(entries, v => v.volume.order.quoted))
-            .to.roundEq(tv.entries.orders.quoted);
-          expect(zMath.sumBy(entries, v => v.volume.order.base)).to.roundEq(tv.entries.orders.base);
-          expect(zMath.sumBy(stops, v => v.volume.order.quoted)).to.roundEq(tv.stops.orders.quoted);
-          expect(zMath.sumBy(stops, v => v.volume.order.base)).to.roundEq(tv.stops.orders.base);
-          expect(zMath.sumBy(takes, v => v.volume.order.quoted)).to.roundEq(tv.takes.orders.quoted);
-          expect(zMath.sumBy(takes, v => v.volume.order.base)).to.roundEq(tv.takes.orders.base);
+          const s = zMath.sumBy.bind(zMath);
+          expect(s(entries, v => v.volume.order.quoted)).to.roundEq(tv.entries.orders.quoted);
+          expect(s(entries, v => v.volume.order.base  )).to.roundEq(tv.entries.orders.base);
+          expect(s(stops,   v => v.volume.order.quoted)).to.roundEq(tv.stops.orders.quoted);
+          expect(s(stops,   v => v.volume.order.base  )).to.roundEq(tv.stops.orders.base);
+          expect(s(takes,   v => v.volume.order.quoted)).to.roundEq(tv.takes.orders.quoted);
+          expect(s(takes,   v => v.volume.order.base  )).to.roundEq(tv.takes.orders.base);
 
           // the main assertion
           expect(tv.loss.quoted /* ? */).to.roundEq(vRiskExpected);
