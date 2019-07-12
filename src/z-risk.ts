@@ -354,7 +354,7 @@ export class ZRisk {
         },
       },
     };
-  } // end getLongTradeOrdersInfo()
+  } // end getShortTradeOrdersInfo()
 
   private getOrdersGroupVolumes(
     ordersArg: TradeOrderArg[],
