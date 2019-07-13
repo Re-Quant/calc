@@ -29,8 +29,7 @@
   },
   "exclude": [
     "node_modules",
-    "dist",
-    "debug"
+    "dist"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
