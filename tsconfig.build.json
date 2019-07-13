@@ -31,7 +31,8 @@
     "node_modules",
     "dist",
     "src/chai",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "debug"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
