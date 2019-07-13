@@ -13,3 +13,7 @@ export interface AvgPricesArgs {
   stops: PriceAndVolumePart[];
   takes: PriceAndVolumePart[];
 }
+
+export interface AvgPricesInfo<T = AvgPrices> {
+  avgPrices: T;
+}

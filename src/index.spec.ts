@@ -45,7 +45,9 @@ describe('index.ts', () => {
           allow:  true,
           max: 10,
           actual: 2.2,
-          marginCallPrice: 1000,
+        },
+        marginCall: {
+          price: 1000,
         },
         maxTradeVolumeQuoted: 10000,
         tradeType: ETradeType.Long,

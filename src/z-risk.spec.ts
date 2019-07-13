@@ -410,6 +410,32 @@ describe('ZRisk', () => {
         expect(stops[2].volume.diff.total.quoted).to.roundEq(tv.loss.quoted * -1, 7);
       });
 
+      it('should margin call price', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops: [
+            { price: 6900, volumePart: .5,  fee: 0.002 },
+            { price: 6800, volumePart: .25, fee: 0.002 },
+            { price: 6500, volumePart: .25, fee: 0.002 },
+          ],
+          takes: [],
+        };
+
+        // act
+        const { marginCall } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(marginCall.price).to.eq(0);
+      });
+
       function runLongIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -839,6 +865,32 @@ describe('ZRisk', () => {
         expect(takes[3].volume.diff.total.quoted).to.roundEq(tv.profit.quoted);
       });
 
+      it('should margin call price', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes: [],
+        };
+
+        // act
+        const { marginCall, avgPrices } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(marginCall.price).to.floatEq(avgPrices.entry * 2);
+      });
+
       function runShortIt(message: string, args: TradeInfoArgs) {
         it(message, () => {
           // arrange
@@ -1020,26 +1072,6 @@ describe('ZRisk', () => {
       });
     });
 
-    describe('.marginCallPrice', () => {
-      it('should calculate the Margin Call Price for Long trade', () => {
-        // @todo: Implement it
-        // arrange
-
-        // act
-
-        // assert
-      });
-
-      it('should calculate the Margin Call Price for Short trade', () => {
-        // @todo: Implement it
-        // arrange
-
-        // act
-
-        // assert
-      });
-    });
-
     describe('.maxTradeVolumeQuoted', () => {
       const makeArgs = (volume: number, maxVolume = +Infinity): TradeVolumeManagementArgs => ({
         preliminaryVolume: volume,
@@ -1168,6 +1200,29 @@ describe('ZRisk', () => {
       const volumeQuoted = volumeBase * avgPrice;  /* ? */
       expect(volumeQuoted).to.roundEq(volumeQuotedExpected);
       expect(avgPrice).to.eq(orders[0].price);
+    });
+  });
+
+  describe('#marginCallPrice()', () => {
+    it('should calculate price for Long', () => {
+      const l = ETradeType.Long;
+      expect(zRisk.marginCallPrice(1, 1000, l)).to.eq(0);
+      expect(zRisk.marginCallPrice(2, 1000, l)).to.eq(500);
+      expect(zRisk.marginCallPrice(4, 1000, l)).to.eq(750);
+      expect(zRisk.marginCallPrice(100, 1000, l)).to.eq(990);
+    });
+
+    it('should calculate price for Short', () => {
+      const s = ETradeType.Short;
+      expect(zRisk.marginCallPrice(1, 1000, s)).to.eq(2000);
+      expect(zRisk.marginCallPrice(2, 1000, s)).to.eq(1500);
+      expect(zRisk.marginCallPrice(4, 1000, s)).to.eq(1250);
+      expect(zRisk.marginCallPrice(100, 1000, s)).to.eq(1010);
+    });
+
+    it('should return NaN for wrong tradeType', () => {
+      const tt = 'Wrong Trade Type' as ETradeType;
+      expect(zRisk.marginCallPrice(1, 1000, tt)).to.be.NaN;
     });
   });
 

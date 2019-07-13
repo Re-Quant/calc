@@ -3,8 +3,9 @@ import { TradeOrder, TradeOrderArg } from './trade-order';
 import { OrdersInfo } from './orders-info';
 import { TakeOrderGroup } from './order-groups';
 import { TradeTypeInfo } from './trade-type.enum';
-import { AvgPrices } from './avg-prices';
+import { AvgPricesInfo } from './avg-prices';
 import { BreakevenTradeInfo, BreakevenTradeInfoArgs } from './breakeven';
+import { MarginCallInfo } from './margin-call';
 
 export interface TradeInfo
   extends
@@ -12,10 +13,9 @@ export interface TradeInfo
     OrdersInfo,
     TradeVolumeCommonInfo,
     TradeTypeInfo,
-    BreakevenTradeInfo {
-
-  avgPrices: AvgPrices;
-}
+    BreakevenTradeInfo,
+    MarginCallInfo,
+    AvgPricesInfo {}
 
 export interface TradeInfoArgs<T = TradeOrderArg>
   extends
@@ -23,5 +23,4 @@ export interface TradeInfoArgs<T = TradeOrderArg>
     TakeOrderGroup<T>,
     TradeVolumeCommonInfoArgs,
     TradeTypeInfo,
-    BreakevenTradeInfoArgs {
-}
+    BreakevenTradeInfoArgs {}

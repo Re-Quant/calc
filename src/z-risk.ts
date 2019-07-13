@@ -2,14 +2,17 @@ import { zMath, ZMath } from './z-math';
 import {
   AllOrderGroups,
   AvgPrices,
-  AvgPricesArgs, BreakevenInfo, BreakevenPriceArgs,
+  AvgPricesArgs,
+  BreakevenInfo,
+  BreakevenPriceArgs,
   ETradeType,
-  FlattenOrdersGroups,
+  FlattenOrdersGroups, MarginCall,
   OrdersInfo,
   OrdersInfoArg,
   PriceAndVolumePart,
   TradeInfo,
-  TradeInfoArgs, TradeOrder,
+  TradeInfoArgs,
+  TradeOrder,
   TradeOrderArg,
   TradeOrderBase,
   TradeVolumeArgs,
@@ -82,13 +85,19 @@ export class ZRisk {
     const leverage = {
       ...p.leverage,
       actual,
-      marginCallPrice: 1024, // mocked data. TODO: Implement it
     };
     return {
       ...p,
       leverage,
       totalTradeVolumeQuoted,
     };
+  }
+
+  public marginCallPrice(leverage: number, price: number, tradeType: ETradeType): number {
+    return tradeType === ETradeType.Long  ? price - price / leverage :
+           tradeType === ETradeType.Short ? price + price / leverage :
+           NaN
+      ;
   }
 
   /**
@@ -134,12 +143,17 @@ export class ZRisk {
       price: this.breakevenPrice({ ...p, ...ordersInfo }),
     };
 
+    const marginCall: MarginCall = {
+      price: this.marginCallPrice(tradeVolumeInfo.leverage.actual, avgPrices.entry, p.tradeType),
+    };
+
     return {
       ...p,
       ...tradeVolumeInfo,
       ...ordersInfo,
-      breakeven,
       avgPrices,
+      breakeven,
+      marginCall,
     };
   }
 
