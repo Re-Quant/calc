@@ -96,8 +96,7 @@ export class ZRisk {
   public marginCallPrice(leverage: number, price: number, tradeType: ETradeType): number {
     return tradeType === ETradeType.Long  ? price - price / leverage :
            tradeType === ETradeType.Short ? price + price / leverage :
-           NaN
-      ;
+           NaN;
   }
 
   /**
