@@ -170,7 +170,7 @@ describe('index.ts', () => {
       };
     });
 
-    it('TradeOrderBase should be exported', () => {
+    it('TradeOrder should be exported', () => {
       const data: index.TradeOrder = {
         price: 1000,
         fee: .001,
