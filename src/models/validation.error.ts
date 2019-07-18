@@ -21,12 +21,12 @@ interface ValidationError {
   data: { [key: string]: any };
 }
 
-export class InvalidArgsError extends Error {
-
-  public constructor(message?: string) {
-    super(message);
-
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
+// export class InvalidArgsError extends Error {
+//
+//   public constructor(message?: string) {
+//     super(message);
+//
+//     // Set the prototype explicitly.
+//     Object.setPrototypeOf(this, new.target.prototype);
+//   }
+// }
