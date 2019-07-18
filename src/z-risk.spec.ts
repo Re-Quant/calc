@@ -112,6 +112,45 @@ describe('ZRisk', () => {
         },
       );
 
+      it('should calculate total fees correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 6900, volumePart: .5,  fee: 0.002 },
+            { price: 6800, volumePart: .25, fee: 0.002 },
+            { price: 6500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 9000, volumePart: .25, fee: 0.002 },
+            { price: 9250, volumePart: .1,  fee: 0.001 },
+            { price: 9500, volumePart: .15, fee: 0.002 },
+            { price: 9900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { entries, stops, takes, totalVolume: tv } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(tv.entries.fees.quoted).to.roundEq(entries[2].volume.diff.total.quoted * -1);
+
+        const s = zMath.sumBy.bind(zMath);
+        expect(tv.entries.fees.quoted).to.roundEq(s(entries, v => v.fee * v.volume.order.quoted));
+        expect(tv.entries.fees.base)  .to.roundEq(s(entries, v => v.fee * v.volume.order.base));
+        expect(tv.stops.fees.quoted)  .to.roundEq(s(stops,   v => v.fee * v.volume.order.quoted));
+        expect(tv.stops.fees.base)    .to.roundEq(s(stops,   v => v.fee * v.volume.order.base));
+        expect(tv.takes.fees.quoted)  .to.roundEq(s(takes,   v => v.fee * v.volume.order.quoted));
+        expect(tv.takes.fees.base)    .to.roundEq(s(takes,   v => v.fee * v.volume.order.base));
+      });
+
       it('should calculate Long trade with one order and manual orders calculation', () => {
         // arrange
         const args = {
@@ -612,6 +651,45 @@ describe('ZRisk', () => {
 
         // the main assertion
         expect(totalVolume.loss.quoted /* ? */).to.roundEq(vRiskExpected);
+      });
+
+      it('should calculate total fees correctly', () => {
+        // arrange
+        const args: TradeInfoArgs = {
+          ...commonInfo,
+          maxTradeVolumeQuoted: +Infinity,
+          deposit: 1000 * 1000 * 1000,
+          entries: [
+            { price: 8000, volumePart: .25, fee: 0.001 },
+            { price: 7500, volumePart: .25, fee: 0.002 },
+            { price: 7000, volumePart: .5,  fee: 0.001 },
+          ],
+          stops:   [
+            { price: 8100, volumePart: .5,  fee: 0.002 },
+            { price: 8200, volumePart: .25, fee: 0.002 },
+            { price: 8500, volumePart: .25, fee: 0.002 },
+          ],
+          takes:   [
+            { price: 5000, volumePart: .25, fee: 0.002 },
+            { price: 5250, volumePart: .1,  fee: 0.001 },
+            { price: 5500, volumePart: .15, fee: 0.002 },
+            { price: 5900, volumePart: .5,  fee: 0.001 },
+          ],
+        };
+
+        // act
+        const { entries, stops, takes, totalVolume: tv } = zRisk.getTradeInfo(args);
+
+        // assert
+        expect(tv.entries.fees.quoted).to.roundEq(entries[2].volume.diff.total.quoted * -1);
+
+        const s = zMath.sumBy.bind(zMath);
+        expect(tv.entries.fees.quoted).to.roundEq(s(entries, v => v.fee * v.volume.order.quoted));
+        expect(tv.entries.fees.base)  .to.roundEq(s(entries, v => v.fee * v.volume.order.base));
+        expect(tv.stops.fees.quoted)  .to.roundEq(s(stops,   v => v.fee * v.volume.order.quoted));
+        expect(tv.stops.fees.base)    .to.roundEq(s(stops,   v => v.fee * v.volume.order.base));
+        expect(tv.takes.fees.quoted)  .to.roundEq(s(takes,   v => v.fee * v.volume.order.quoted));
+        expect(tv.takes.fees.base)    .to.roundEq(s(takes,   v => v.fee * v.volume.order.base));
       });
 
       it('should calculate avg prices correctly', () => {
