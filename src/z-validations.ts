@@ -95,7 +95,7 @@ export class ZValidations {
     }
   }
 
-  public checkCommonFields(p: TradeInfoArgs) {
+  public checkCommonFields(p: TradeInfoArgs): ValidationTradeErrors | null {
     if (!p.deposit && !this.isDefined(p.deposit)) {
       this.errors.deposit = {
         message: ERROR_MESSAGES.required,
@@ -201,7 +201,7 @@ export class ZValidations {
 
     return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
       ? this.errors
-      : true;
+      : null;
   }
 
   public validate(p: TradeInfoArgs) {
