@@ -79,6 +79,14 @@ export class ZValidations {
     return value instanceof String || typeof value === 'string';
   }
 
+  public min(value: number, minValue: number): boolean {
+    return value >= minValue;
+  }
+
+  public max(value: number, maxValue: number): boolean {
+    return value <= maxValue;
+  }
+
   public getMaxStopLossPrice(p: TradeInfoArgs): number {
   //   return _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
   }
@@ -95,7 +103,8 @@ export class ZValidations {
     }
   }
 
-  public checkCommonFields(p: TradeInfoArgs): ValidationTradeErrors | null {
+  public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | null {
+    // deposit
     if (!p.deposit && !this.isDefined(p.deposit)) {
       this.errors.deposit = {
         message: ERROR_MESSAGES.required,
@@ -108,6 +117,13 @@ export class ZValidations {
       };
     }
 
+    if (p.deposit && this.isNumber(p.deposit) && !this.min(p.deposit, 0)) {
+      this.errors.deposit = {
+        message: ERROR_MESSAGES.number,
+      };
+    }
+
+    // risk
     if (!p.risk && !this.isDefined(p.risk)) {
       this.errors.risk = {
         message: ERROR_MESSAGES.required,
@@ -120,6 +136,21 @@ export class ZValidations {
       };
     }
 
+    if (p.risk && this.isNumber(p.risk) && !this.min(p.risk, 0)) {
+      this.errors.risk = {
+        message: ERROR_MESSAGES.number,
+        actual: p.risk,
+      };
+    }
+
+    if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 1)) {
+      this.errors.risk = {
+        message: ERROR_MESSAGES.number,
+        actual: p.risk,
+      };
+    }
+
+    // maxTradeVolumeQuoted
     if (!p.maxTradeVolumeQuoted && !this.isDefined(p.maxTradeVolumeQuoted)) {
       this.errors.maxTradeVolumeQuoted = {
         message: ERROR_MESSAGES.required,
@@ -132,6 +163,17 @@ export class ZValidations {
       };
     }
 
+    if (p.maxTradeVolumeQuoted
+      && this.isNumber(p.maxTradeVolumeQuoted)
+      && !this.min(p.maxTradeVolumeQuoted, 0)
+    ) {
+      this.errors.risk = {
+        message: ERROR_MESSAGES.number,
+        actual: p.maxTradeVolumeQuoted,
+      };
+    }
+
+    // leverage
     if (!p.leverage || !p.leverage.allow) {
       this.errors.leverage = {
         allow: {
@@ -156,7 +198,7 @@ export class ZValidations {
       };
     }
 
-    if (p.leverage && p.leverage.allow && !this.isNumber(p.leverage.max)) {
+    if (p.leverage && p.leverage.max && !this.isNumber(p.leverage.max)) {
       this.errors.leverage = {
         max: {
           message: ERROR_MESSAGES.required,
@@ -164,13 +206,29 @@ export class ZValidations {
       };
     }
 
-    // TODO: need to discus about configuration for max leverage
     if (p.leverage
-      && p.leverage.allow
-      && this.isNumber(p.leverage.max) && p.leverage.max >= 100) {
-      this.errors.common.push();
+      && p.leverage.max
+      && this.isNumber(p.leverage.max)
+      && !this.min(p.leverage.max, 0)
+    ) {
+      this.errors.risk = {
+        message: ERROR_MESSAGES.number,
+        actual: p.leverage.max,
+      };
     }
 
+    if (p.leverage
+      && p.leverage.max
+      && this.isNumber(p.leverage.max)
+      && !this.max(p.leverage.max, 1000)
+    ) {
+      this.errors.risk = {
+        message: ERROR_MESSAGES.number,
+        actual: p.leverage.max,
+      };
+    }
+
+    // tradeType
     if (!p.tradeType) {
       this.errors.tradeType = {
         message: ERROR_MESSAGES.required,
@@ -183,6 +241,7 @@ export class ZValidations {
       };
     }
 
+    // breakeven
     if (!p.breakeven || !p.breakeven.fee) {
       this.errors.breakeven = {
         fee: {
@@ -205,6 +264,18 @@ export class ZValidations {
   }
 
   public validate(p: TradeInfoArgs) {
-    const isValidCommonFields = this.checkCommonFields(p);
+    const isValidCommonFields = this.validateCommonFields(p);
+  }
+
+  private buildError(key: string, msg: string, path?: string): void {
+    this.errors[key] = {
+      message: msg,
+    }
+  }
+
+  private setError() {}
+
+  private cleanErrors(): void {
+    this.errors = {};
   }
 }
