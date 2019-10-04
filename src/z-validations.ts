@@ -270,10 +270,12 @@ export class ZValidations {
   private buildError(key: string, msg: string, path?: string): void {
     this.errors[key] = {
       message: msg,
-    }
+    };
   }
 
-  private setError() {}
+  private setError() {
+    //
+  }
 
   private cleanErrors(): void {
     this.errors = {};
