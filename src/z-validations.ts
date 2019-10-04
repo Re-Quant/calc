@@ -21,21 +21,21 @@ export interface IsNumberOptions {
 }
 
 interface ValidationTradeErrors {
-  tradeType?: ErrorInfo,
-  deposit?: ErrorInfo,
-  risk?: ErrorInfo,
-  maxTradeVolumeQuoted?: ErrorInfo,
+  tradeType?: ErrorInfo;
+  deposit?: ErrorInfo;
+  risk?: ErrorInfo;
+  maxTradeVolumeQuoted?: ErrorInfo;
   leverage?: {
-    allow?: ErrorInfo,
-    max?: ErrorInfo,
-  },
+    allow?: ErrorInfo;
+    max?: ErrorInfo;
+  };
   breakeven?: {
-    fee?: ErrorInfo,
-  },
+    fee?: ErrorInfo;
+  };
 
-  entries?: TradeOrderErrors,
-  stops?: TradeOrderErrors,
-  takes?: TradeOrderErrors,
+  entries?: TradeOrderErrors;
+  stops?: TradeOrderErrors;
+  takes?: TradeOrderErrors;
 }
 
 enum ERROR_MESSAGES {
@@ -52,8 +52,11 @@ export class ZValidations {
     return value !== undefined && value !== null;
   }
 
-  public isNumber(value: unknown, options: IsNumberOptions = { allowNaN: false, allowInfinity: false }): boolean {
-    if (typeof value !== "number") {
+  public isNumber(value: unknown, options: IsNumberOptions = {
+    allowNaN: false,
+    allowInfinity: false
+  }): boolean {
+    if (typeof value !== 'number') {
       return false;
     }
 
@@ -68,28 +71,28 @@ export class ZValidations {
     return Number.isFinite(value);
   }
 
-  isBoolean(value: unknown): boolean {
-    return value instanceof Boolean || typeof value === "boolean";
+  public isBoolean(value: unknown): boolean {
+    return value instanceof Boolean || typeof value === 'boolean';
   }
 
-  isString(value: unknown): boolean {
-    return value instanceof String || typeof value === "string";
+  public isString(value: unknown): boolean {
+    return value instanceof String || typeof value === 'string';
   }
 
-  public getMaxStopLossPrice(p: TradeInfoArgs): number {
-    return _.maxBy(p.stops, function(o: TradeOrderArg) { return o.price; });
-  }
+  // public getMaxStopLossPrice(p: TradeInfoArgs): number {
+  //   return _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
+  // }
 
   public checkEntriesOrder(p: TradeInfoArgs) {
     const isLongType = p.tradeType === ETradeType.Long;
 
-    if (p.tradeType === ETradeType.Long) {
-      const maxStopLossPrice: number = _.maxBy(p.stops, function(o: TradeOrderArg) { return o.price; });
-    }
-
-    if (p.tradeType === ETradeType.Short) {
-
-    }
+    // if (p.tradeType === ETradeType.Long) {
+    //   const maxStopLossPrice: number = _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
+    // }
+    //
+    // if (p.tradeType === ETradeType.Short) {
+    //
+    // }
   }
 
   public checkCommonFields(p: TradeInfoArgs) {
@@ -98,7 +101,7 @@ export class ZValidations {
         message: ERROR_MESSAGES.required,
       };
     }
-    
+
     if (p.deposit && !this.isNumber(p.deposit)) {
       this.errors.deposit = {
         message: ERROR_MESSAGES.number,
@@ -110,7 +113,7 @@ export class ZValidations {
         message: ERROR_MESSAGES.required,
       };
     }
-    
+
     if (p.risk && !this.isNumber(p.risk)) {
       this.errors.risk = {
         message: ERROR_MESSAGES.number,
@@ -142,7 +145,7 @@ export class ZValidations {
         allow: {
           message: ERROR_MESSAGES.boolean,
         },
-      }
+      };
     }
 
     if (!p.leverage || !p.leverage.max) {
@@ -162,7 +165,9 @@ export class ZValidations {
     }
 
     // TODO: need to discus about configuration for max leverage
-    if (p.leverage && p.leverage.allow && this.isNumber(p.leverage.max) && p.leverage.max >= 100) {
+    if (p.leverage
+      && p.leverage.allow
+      && this.isNumber(p.leverage.max) && p.leverage.max >= 100) {
       this.errors.common.push();
     }
 
@@ -194,7 +199,9 @@ export class ZValidations {
       };
     }
 
-    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object ? this.errors : true;
+    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
+      ? this.errors
+      : true;
   }
 
   public validate(p: TradeInfoArgs) {
