@@ -79,20 +79,20 @@ export class ZValidations {
     return value instanceof String || typeof value === 'string';
   }
 
-  // public getMaxStopLossPrice(p: TradeInfoArgs): number {
+  public getMaxStopLossPrice(p: TradeInfoArgs): number {
   //   return _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
-  // }
+  }
 
   public checkEntriesOrder(p: TradeInfoArgs) {
     const isLongType = p.tradeType === ETradeType.Long;
 
-    // if (p.tradeType === ETradeType.Long) {
-    //   const maxStopLossPrice: number = _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
-    // }
+    if (p.tradeType === ETradeType.Long) {
+      //   const maxStopLossPrice: number = _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
+    }
     //
-    // if (p.tradeType === ETradeType.Short) {
-    //
-    // }
+    if (p.tradeType === ETradeType.Short) {
+      //
+    }
   }
 
   public checkCommonFields(p: TradeInfoArgs) {
