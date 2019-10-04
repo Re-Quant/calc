@@ -95,44 +95,44 @@ export class ZValidations {
   public checkCommonFields(p: TradeInfoArgs) {
     if (!p.deposit && !this.isDefined(p.deposit)) {
       this.errors.deposit = {
-        message: ERROR_MESSAGES.required
+        message: ERROR_MESSAGES.required,
       };
     }
     
     if (p.deposit && !this.isNumber(p.deposit)) {
       this.errors.deposit = {
-        message: ERROR_MESSAGES.number
+        message: ERROR_MESSAGES.number,
       };
     }
 
     if (!p.risk && !this.isDefined(p.risk)) {
       this.errors.risk = {
-        message: ERROR_MESSAGES.required
+        message: ERROR_MESSAGES.required,
       };
     }
     
     if (p.risk && !this.isNumber(p.risk)) {
       this.errors.risk = {
-        message: ERROR_MESSAGES.number
+        message: ERROR_MESSAGES.number,
       };
     }
 
     if (!p.maxTradeVolumeQuoted && !this.isDefined(p.maxTradeVolumeQuoted)) {
       this.errors.maxTradeVolumeQuoted = {
-        message: ERROR_MESSAGES.required
+        message: ERROR_MESSAGES.required,
       };
     }
 
     if (p.maxTradeVolumeQuoted && !this.isNumber(p.maxTradeVolumeQuoted)) {
       this.errors.maxTradeVolumeQuoted = {
-        message: ERROR_MESSAGES.number
+        message: ERROR_MESSAGES.number,
       };
     }
 
     if (!p.leverage || !p.leverage.allow) {
       this.errors.leverage = {
         allow: {
-          message: ERROR_MESSAGES.required
+          message: ERROR_MESSAGES.required,
         }
       };
     }
@@ -140,15 +140,15 @@ export class ZValidations {
     if (p.leverage && p.leverage.allow && !this.isBoolean(p.leverage.allow)) {
       this.errors.leverage = {
         allow: {
-          message: ERROR_MESSAGES.boolean
-        }
-      };
+          message: ERROR_MESSAGES.boolean,
+        },
+      }
     }
 
     if (!p.leverage || !p.leverage.max) {
       this.errors.leverage = {
         max: {
-          message: ERROR_MESSAGES.required
+          message: ERROR_MESSAGES.required,
         }
       };
     }
@@ -156,7 +156,7 @@ export class ZValidations {
     if (p.leverage && p.leverage.allow && !this.isNumber(p.leverage.max)) {
       this.errors.leverage = {
         max: {
-          message: ERROR_MESSAGES.required
+          message: ERROR_MESSAGES.required,
         }
       };
     }
@@ -168,20 +168,20 @@ export class ZValidations {
 
     if (!p.tradeType) {
       this.errors.tradeType = {
-        message: ERROR_MESSAGES.required
+        message: ERROR_MESSAGES.required,
       };
     }
 
     if (p.tradeType && !this.isString(p.tradeType)) {
       this.errors.tradeType = {
-        message: ERROR_MESSAGES.string
+        message: ERROR_MESSAGES.string,
       };
     }
 
     if (!p.breakeven || !p.breakeven.fee) {
       this.errors.breakeven = {
         fee: {
-          message: ERROR_MESSAGES.required
+          message: ERROR_MESSAGES.required,
         }
       };
     }
@@ -189,7 +189,7 @@ export class ZValidations {
     if (p.breakeven && p.breakeven.fee && !this.isNumber(p.breakeven.fee)) {
       this.errors.breakeven = {
         fee: {
-          message: ERROR_MESSAGES.number
+          message: ERROR_MESSAGES.number,
         }
       };
     }
@@ -199,6 +199,5 @@ export class ZValidations {
 
   public validate(p: TradeInfoArgs) {
     const isValidCommonFields = this.checkCommonFields(p);
-
   }
 }
