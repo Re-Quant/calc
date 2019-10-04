@@ -45,7 +45,7 @@ enum ERROR_MESSAGES {
   boolean = 'should be a boolean',
 }
 
-export class ZValidations {
+class ZValidations {
   private errors: ValidationTradeErrors = {};
 
   public isDefined(value: unknown): boolean {
@@ -281,3 +281,5 @@ export class ZValidations {
     this.errors = {};
   }
 }
+
+export const ZValidations = new ZValidations();
