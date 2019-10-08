@@ -38,7 +38,6 @@ export interface ValidationTradeErrors {
   takes?: TradeOrderErrors;
 }
 
-
 class ZValidationErrorFactory {
   public createErrorInfo(
     model: ValidationTradeErrors = {},
