@@ -289,11 +289,15 @@ class ZValidations {
       : null;
   }
 
+  public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | null {}
+  public validateStops(p: TradeInfoArgs): ValidationTradeErrors | null {}
+  public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | null {}
+
   public validate(p: TradeInfoArgs) {
     const isValidCommonFields = this.validateCommonFields(p);
-    const isValidEntries;
-    const isValidStops;
-    const isValidTakes;
+    const isValidEntries = this.validateEntries(p);
+    const isValidStops = this.validateStops(p);
+    const isValidTakes = this.validateTakes(p);
   }
 
   private cleanErrors(): void {
