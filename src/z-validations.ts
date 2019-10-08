@@ -40,7 +40,11 @@ export interface ValidationTradeErrors {
 
 
 class ZValidationErrorFactory {
-  public createErrorInfo(model: ValidationTradeErrors = {}, path: string, value: ErrorInfo | TradeOrderErrors): ValidationTradeErrors {
+  public createErrorInfo(
+    model: ValidationTradeErrors = {},
+    path: string,
+    value: ErrorInfo | TradeOrderErrors,
+  ): ValidationTradeErrors {
     let model = model;
     const pathParts = path.split('.');
     let currentObject = model;
