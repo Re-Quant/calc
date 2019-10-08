@@ -38,55 +38,43 @@ export interface ValidationTradeErrors {
   takes?: TradeOrderErrors;
 }
 
-export enum ERROR_MESSAGES {
-  required = 'required field',
-  number = 'should be a number',
-  string = 'should be a string',
-  boolean = 'should be a boolean',
-}
-
-export enum ERROR_TYPE {
-  common = 'common',
-  order = 'order',
-}
 
 class ZValidationErrorFactory {
-  createError(type: Object);
-  createError(type: ERROR_TYPE.common): ErrorInfo;
-  createError(type: ERROR_TYPE.order): TradeOrderErrors;
+  public createErrorInfo(model = {}, path: string, value: ErrorInfo | TradeOrderErrors) {
+    let model = model;
+    const pathParts = path.split('.');
+    let currentObject = model;
 
-  public createError(option): ErrorInfo | TradeOrderErrors {
-    switch (option.type) {
-      case ERROR_TYPE.common:
-        const errorInfo = {
-          message: option.msg,
-        };
+    for (let i in pathParts) {
+      const key = pathParts[i];
+      const length = pathParts.length - 1;
 
-        if (option.actual) {
-          errorInfo.actual = option.actual;
-        }
-
-        return errorInfo;
-      case ERROR_TYPE.order:
-        const errorInfo = {
-          message: option.msg,
-        };
-
-        if (option.actual) {
-          errorInfo.actual = option.actual;
-        }
-
-        errorInfo.index = option.index;
-
-        return errorInfo;
+      if (+i === length) {
+        currentObject[key] = value;
         break;
-      default:
-        throw new Error('Select either a Error type');
+      }
+
+      if (typeof currentObject[key] === 'undefined') {
+        currentObject[key] = {};
+      }
+
+      currentObject = currentObject[key];
     }
-  }
+
+    return model;
+  };
 }
 
 class ZValidations {
+  public messages = {
+    required: 'required field',
+    number: 'should be a number',
+    string: 'should be a string',
+    boolean: 'should be a boolean',
+    minValue: (actual: number): string => `Value should more then ${ actual }.`,
+    maxValue: (actual: number): string => `Value should less then ${ actual }.`,
+  }
+
   private errors: ValidationTradeErrors = {};
 
   constructor() {
@@ -151,69 +139,61 @@ class ZValidations {
   public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | null {
     // deposit
     if (!p.deposit && !this.isDefined(p.deposit)) {
-      this.errors.deposit = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.required,
+      this.zErrorFactory.createErrorInfo(this.errors, 'deposit', {
+        message: this.messages.required,
       });
     }
 
     if (p.deposit && !this.isNumber(p.deposit)) {
-      this.errors.deposit = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'deposit', {
+        message: this.messages.number,
       });
     }
 
     if (p.deposit && this.isNumber(p.deposit) && !this.min(p.deposit, 0)) {
-      this.errors.deposit = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'deposit', {
+        message: this.messages.minValue(p.deposit),
+        actual: p.deposit,
       });
     }
 
     // risk
     if (!p.risk && !this.isDefined(p.risk)) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.required,
+      this.zErrorFactory.createErrorInfo(this.errors, 'risk', {
+        message: this.messages.required,
       });
     }
 
     if (p.risk && !this.isNumber(p.risk)) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'risk', {
+        message: this.messages.number,
       });
     }
 
     if (p.risk && this.isNumber(p.risk) && !this.min(p.risk, 0)) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'risk', {
+        message: this.messages.minValue(p.risk),
         actual: p.risk,
       });
     }
 
     if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 1)) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'risk', {
+        message: this.messages.maxValue(p.risk),
         actual: p.risk,
       });
     }
 
     // maxTradeVolumeQuoted
     if (!p.maxTradeVolumeQuoted && !this.isDefined(p.maxTradeVolumeQuoted)) {
-      this.errors.maxTradeVolumeQuoted = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.required,
+      this.zErrorFactory.createErrorInfo(this.errors, 'maxTradeVolumeQuoted', {
+        message: this.messages.required,
       });
     }
 
     if (p.maxTradeVolumeQuoted && !this.isNumber(p.maxTradeVolumeQuoted)) {
-      this.errors.maxTradeVolumeQuoted = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'maxTradeVolumeQuoted', {
+        message: this.messages.number,
       });
     }
 
@@ -221,44 +201,35 @@ class ZValidations {
       && this.isNumber(p.maxTradeVolumeQuoted)
       && !this.min(p.maxTradeVolumeQuoted, 0)
     ) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'maxTradeVolumeQuoted', {
+        message: this.messages.minValue(p.risk),
         actual: p.maxTradeVolumeQuoted,
       });
     }
 
     // leverage
     if (!p.leverage || !p.leverage.allow) {
-      this.errors.leverage = {
-        allow: {
-          message: ERROR_MESSAGES.required,
-        }
-      };
+      this.zErrorFactory.createErrorInfo(this.errors, 'leverage.allow', {
+        message: this.messages.required,
+      });
     }
 
     if (p.leverage && p.leverage.allow && !this.isBoolean(p.leverage.allow)) {
-      this.errors.leverage = {
-        allow: {
-          message: ERROR_MESSAGES.boolean,
-        },
-      };
+      this.zErrorFactory.createErrorInfo(this.errors, 'leverage.allow', {
+        message: this.messages.boolean,
+      });
     }
 
     if (!p.leverage || !p.leverage.max) {
-      this.errors.leverage = {
-        max: {
-          message: ERROR_MESSAGES.required,
-        }
-      };
+      this.zErrorFactory.createErrorInfo(this.errors, 'leverage.max', {
+        message: this.messages.required,
+      });
     }
 
     if (p.leverage && p.leverage.max && !this.isNumber(p.leverage.max)) {
-      this.errors.leverage = {
-        max: {
-          message: ERROR_MESSAGES.required,
-        }
-      };
+      this.zErrorFactory.createErrorInfo(this.errors, 'leverage.max', {
+        message: this.messages.number,
+      });
     }
 
     if (p.leverage
@@ -266,9 +237,8 @@ class ZValidations {
       && this.isNumber(p.leverage.max)
       && !this.min(p.leverage.max, 0)
     ) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'leverage.max', {
+        message: this.messages.minValue(leverage.max),
         actual: p.leverage.max,
       });
     }
@@ -278,43 +248,36 @@ class ZValidations {
       && this.isNumber(p.leverage.max)
       && !this.max(p.leverage.max, 1000)
     ) {
-      this.errors.risk = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.number,
+      this.zErrorFactory.createErrorInfo(this.errors, 'leverage.max', {
+        message: this.messages.maxValue(leverage.max),
         actual: p.leverage.max,
       });
     }
 
     // tradeType
     if (!p.tradeType) {
-      this.errors.tradeType = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.required,
+      this.zErrorFactory.createErrorInfo(this.errors, 'tradeType', {
+        message: this.messages.required,
       });
     }
 
     if (p.tradeType && !this.isString(p.tradeType)) {
-      this.errors.tradeType = this.zErrorFactory.createError({
-        type: ERROR_TYPE.common,
-        message: ERROR_MESSAGES.string,
+      this.zErrorFactory.createErrorInfo(this.errors, 'tradeType', {
+        message: this.messages.string,
       });
     }
 
     // breakeven
     if (!p.breakeven || !p.breakeven.fee) {
-      this.errors.breakeven = {
-        fee: {
-          message: ERROR_MESSAGES.required,
-        }
-      };
+      this.zErrorFactory.createErrorInfo(this.errors, 'breakeven.fee', {
+        message: this.messages.required,
+      });
     }
 
     if (p.breakeven && p.breakeven.fee && !this.isNumber(p.breakeven.fee)) {
-      this.errors.breakeven = {
-        fee: {
-          message: ERROR_MESSAGES.number,
-        }
-      };
+      this.zErrorFactory.createErrorInfo(this.errors, 'breakeven.fee', {
+        message: this.messages.number,
+      });
     }
 
     return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
