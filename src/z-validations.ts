@@ -4,14 +4,14 @@ import {
   TradeOrderArg
 } from './models';
 
-interface ErrorInfo<T> {
+export interface ErrorInfo<T> {
   message: string;
   actual?: T;
 }
 
-type OrderError = {[key in keyof TradeOrderArg]?: ErrorInfo};
+export type OrderError = {[key in keyof TradeOrderArg]?: ErrorInfo};
 
-interface TradeOrderErrors {
+export interface TradeOrderErrors {
   [orderIndex: number]: OrderError;
 }
 
@@ -20,7 +20,7 @@ export interface IsNumberOptions {
   allowInfinity?: boolean;
 }
 
-interface ValidationTradeErrors {
+export interface ValidationTradeErrors {
   tradeType?: ErrorInfo;
   deposit?: ErrorInfo;
   risk?: ErrorInfo;
@@ -38,15 +38,60 @@ interface ValidationTradeErrors {
   takes?: TradeOrderErrors;
 }
 
-enum ERROR_MESSAGES {
+export enum ERROR_MESSAGES {
   required = 'required field',
   number = 'should be a number',
   string = 'should be a string',
   boolean = 'should be a boolean',
 }
 
+export enum ERROR_TYPE {
+  common = 'common',
+  order = 'order',
+}
+
+class ZValidationErrorFactory {
+  createError(type: Object);
+  createError(type: ERROR_TYPE.common): ErrorInfo;
+  createError(type: ERROR_TYPE.order): TradeOrderErrors;
+
+  public createError(option): ErrorInfo | TradeOrderErrors {
+    switch (option.type) {
+      case ERROR_TYPE.common:
+        const errorInfo = {
+          message: option.msg,
+        };
+
+        if (option.actual) {
+          errorInfo.actual = option.actual;
+        }
+
+        return errorInfo;
+      case ERROR_TYPE.order:
+        const errorInfo = {
+          message: option.msg,
+        };
+
+        if (option.actual) {
+          errorInfo.actual = option.actual;
+        }
+
+        errorInfo.index = option.index;
+
+        return errorInfo;
+        break;
+      default:
+        throw new Error('Select either a Error type');
+    }
+  }
+}
+
 class ZValidations {
   private errors: ValidationTradeErrors = {};
+
+  constructor() {
+    this.zErrorFactory = new ZValidationErrorFactory();
+  }
 
   public isDefined(value: unknown): boolean {
     return value !== undefined && value !== null;
@@ -106,71 +151,81 @@ class ZValidations {
   public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | null {
     // deposit
     if (!p.deposit && !this.isDefined(p.deposit)) {
-      this.errors.deposit = {
+      this.errors.deposit = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.required,
-      };
+      });
     }
 
     if (p.deposit && !this.isNumber(p.deposit)) {
-      this.errors.deposit = {
+      this.errors.deposit = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
-      };
+      });
     }
 
     if (p.deposit && this.isNumber(p.deposit) && !this.min(p.deposit, 0)) {
-      this.errors.deposit = {
+      this.errors.deposit = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
-      };
+      });
     }
 
     // risk
     if (!p.risk && !this.isDefined(p.risk)) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.required,
-      };
+      });
     }
 
     if (p.risk && !this.isNumber(p.risk)) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
-      };
+      });
     }
 
     if (p.risk && this.isNumber(p.risk) && !this.min(p.risk, 0)) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
         actual: p.risk,
-      };
+      });
     }
 
     if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 1)) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
         actual: p.risk,
-      };
+      });
     }
 
     // maxTradeVolumeQuoted
     if (!p.maxTradeVolumeQuoted && !this.isDefined(p.maxTradeVolumeQuoted)) {
-      this.errors.maxTradeVolumeQuoted = {
+      this.errors.maxTradeVolumeQuoted = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.required,
-      };
+      });
     }
 
     if (p.maxTradeVolumeQuoted && !this.isNumber(p.maxTradeVolumeQuoted)) {
-      this.errors.maxTradeVolumeQuoted = {
+      this.errors.maxTradeVolumeQuoted = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
-      };
+      });
     }
 
     if (p.maxTradeVolumeQuoted
       && this.isNumber(p.maxTradeVolumeQuoted)
       && !this.min(p.maxTradeVolumeQuoted, 0)
     ) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
         actual: p.maxTradeVolumeQuoted,
-      };
+      });
     }
 
     // leverage
@@ -211,10 +266,11 @@ class ZValidations {
       && this.isNumber(p.leverage.max)
       && !this.min(p.leverage.max, 0)
     ) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
         actual: p.leverage.max,
-      };
+      });
     }
 
     if (p.leverage
@@ -222,23 +278,26 @@ class ZValidations {
       && this.isNumber(p.leverage.max)
       && !this.max(p.leverage.max, 1000)
     ) {
-      this.errors.risk = {
+      this.errors.risk = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.number,
         actual: p.leverage.max,
-      };
+      });
     }
 
     // tradeType
     if (!p.tradeType) {
-      this.errors.tradeType = {
+      this.errors.tradeType = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.required,
-      };
+      });
     }
 
     if (p.tradeType && !this.isString(p.tradeType)) {
-      this.errors.tradeType = {
+      this.errors.tradeType = this.zErrorFactory.createError({
+        type: ERROR_TYPE.common,
         message: ERROR_MESSAGES.string,
-      };
+      });
     }
 
     // breakeven
@@ -265,6 +324,9 @@ class ZValidations {
 
   public validate(p: TradeInfoArgs) {
     const isValidCommonFields = this.validateCommonFields(p);
+    const isValidEntries;
+    const isValidStops;
+    const isValidTakes;
   }
 
   private buildError(key: string, msg: string, path?: string): void {
