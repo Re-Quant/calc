@@ -74,6 +74,7 @@ class ZValidations {
     minValue: (actual: number): string => `Value should more then ${ actual }.`,
     maxValue: (actual: number): string => `Value should less then ${ actual }.`,
   }
+  public zErrorFactory: ZValidationErrorFactory;
 
   private errors: ValidationTradeErrors = {};
 
