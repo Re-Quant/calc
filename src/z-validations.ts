@@ -140,7 +140,7 @@ class ZValidations {
     }
   }
 
-  public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | null {
+  public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | void {
     // deposit
     if (!p.deposit && !this.isDefined(p.deposit)) {
       this.zErrorFactory.createErrorInfo(this.errors, 'deposit', {
@@ -286,12 +286,12 @@ class ZValidations {
 
     return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
       ? this.errors
-      : null;
+      : undefined;
   }
 
-  public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | null {}
-  public validateStops(p: TradeInfoArgs): ValidationTradeErrors | null {}
-  public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | null {}
+  public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | void {}
+  public validateStops(p: TradeInfoArgs): ValidationTradeErrors | void {}
+  public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | void {}
 
   public validate(p: TradeInfoArgs) {
     const isValidCommonFields = this.validateCommonFields(p);
