@@ -43,17 +43,17 @@ class ZValidationErrorFactory {
     keys: [K1],
     value: ErrorInfo,
     model: O,
-  ): O[K1];
+  ): ValidationTradeErrors;
   public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof O[K1]>(
     keys: [K1, K2],
     value: ErrorInfo,
     model: O,
-  ): O[K1][K2];
+  ): ValidationTradeErrors;
   public createErrorInfo<O extends ValidationTradeErrors>(
     keys: string[],
     value: ErrorInfo,
     model: O,
-  ): any {
+  ): ValidationTradeErrors {
     let currentObject: any = model;
 
     for (let i in keys) {
