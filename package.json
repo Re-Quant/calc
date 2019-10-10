@@ -13,7 +13,7 @@
     "webpack_": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
     "build:dev": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
     "build:prod": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.prod.js --progress --profile --bail",
-    "lint": "tslint \"src/**/*.ts\" --project tsconfig.json",
+    "lint": "eslint --ext .js,.ts src/**",
     "lint:fix": "npm run lint -- --fix",
     "test": "mochapack --include src/chai --webpack-config \"config/webpack/webpack.mocha.js\" \"src/**/*.spec.ts\"",
     "test:watch": "npm run test -- --watch",
@@ -25,27 +25,40 @@
     "npm:version:update_": "PREV_VER=$npm_package_version && npm version $VERSION_PART_NAME -m \"Update package version:$VERSION_PART_NAME: $PREV_VER -> %s\" && git push --no-verify && git push --no-verify --tags",
     "npm:version:update-major": "VERSION_PART_NAME=major npm run npm:version:update_",
     "npm:version:update-minor": "VERSION_PART_NAME=minor npm run npm:version:update_",
-    "npm:version:update-patch": "VERSION_PART_NAME=patch npm run npm:version:update_"
+    "npm:version:update-patch": "VERSION_PART_NAME=patch npm run npm:version:update_",
+    "merge-tpl-repo": "tools/merge-with-repository-template.sh",
+    "prepush": "npm run lint && npm run test && npm run build:prod"
   },
   "devDependencies": {
     "@types/chai": "~4.1.7",
     "@types/mocha": "~5.2.7",
     "@types/node": "~12.0.4",
     "@types/webpack": "~4.4.32",
+    "@typescript-eslint/eslint-plugin": "~2.3.3",
+    "@typescript-eslint/parser": "~2.3.3",
     "chai": "~4.2.0",
     "copy-webpack-plugin": "~5.0.3",
+    "eslint": "~6.5.1",
+    "eslint-config-airbnb-base": "~14.0.0",
+    "eslint-plugin-filenames": "~1.3.2",
+    "eslint-plugin-import": "~2.18.2",
+    "eslint-plugin-promise": "~4.2.1",
+    "eslint-plugin-unicorn": "~12.0.2",
+    "husky": "~3.0.8",
     "mocha": "~6.1.4",
     "mochapack": "~1.1.1",
-    "rimraf": "~2.6.3",
+    "rimraf": "~3.0.0",
     "ts-loader": "~6.0.4",
-    "tslint": "~5.17.0",
-    "tslint-config-airbnb": "^5.11.1",
-    "tslint-eslint-rules": "~5.4.0",
-    "typescript": "~3.5.1",
+    "typescript": "~3.6.4",
     "wallaby-webpack": "~3.9.15",
     "webpack": "~4.32.2",
     "webpack-cli": "~3.3.2",
     "webpack-merge": "~4.2.1",
     "webpack-node-externals": "~1.7.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run prepush"
+    }
   }
 }
