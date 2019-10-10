@@ -21,21 +21,21 @@ export interface IsNumberOptions {
 }
 
 export interface ValidationTradeErrors {
-  tradeType: ErrorInfo;
-  deposit: ErrorInfo;
-  risk: ErrorInfo;
-  maxTradeVolumeQuoted: ErrorInfo;
-  leverage: {
+  tradeType?: ErrorInfo;
+  deposit?: ErrorInfo;
+  risk?: ErrorInfo;
+  maxTradeVolumeQuoted?: ErrorInfo;
+  leverage?: {
     allow?: ErrorInfo;
     max?: ErrorInfo;
   };
-  breakeven: {
+  breakeven?: {
     fee?: ErrorInfo;
   };
 
-  entries: TradeOrderErrors;
-  stops: TradeOrderErrors;
-  takes: TradeOrderErrors;
+  entries?: TradeOrderErrors;
+  stops?: TradeOrderErrors;
+  takes?: TradeOrderErrors;
 }
 
 class ZValidationErrorFactory {
@@ -43,12 +43,12 @@ class ZValidationErrorFactory {
     keys: [K1],
     value: ErrorInfo,
     model: O,
-  ): ValidationTradeErrors;
-  public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof O[K1]>(
+  ): O[K1];
+  public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof Required<O>[K1]>(
     keys: [K1, K2],
     value: ErrorInfo,
     model: O,
-  ): ValidationTradeErrors;
+  ): O[K1][K2];
   public createErrorInfo<O extends ValidationTradeErrors>(
     keys: string[],
     value: ErrorInfo,
@@ -132,7 +132,7 @@ class ZValidations {
     return value <= maxValue;
   }
 
-  public getMaxStopLossPrice(p: TradeInfoArgs): number {
+  public getMaxStopLossPrice(p: TradeInfoArgs) {
   //   return _.maxBy(p.stops, (o: TradeOrderArg) => o.price);
   }
 
