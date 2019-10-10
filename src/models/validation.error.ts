@@ -9,9 +9,7 @@ export enum ValidationCodes {
 
 class ZValidators {
   public static min(min: number) {
-    return (value: any) => {
-      return value < min;
-    };
+    return (value: any): boolean => value < min;
   }
 }
 

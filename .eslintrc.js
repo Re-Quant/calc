@@ -7,6 +7,7 @@ module.exports = {
   },
   env: {
     jest: true,
+    es6: true,
   },
   plugins: [
     '@typescript-eslint',
@@ -52,5 +53,38 @@ module.exports = {
     }],
     '@typescript-eslint/no-explicit-any': 'off',
     'class-methods-use-this': 'off',
+    'no-multi-spaces': 'off',
+    'no-floating-decimal': 'off',
+    'key-spacing': ['error', {
+      beforeColon: false,
+      afterColon: true,
+      mode: 'minimum'
+    }],
+    'padded-blocks': ['error', {
+      switches: 'never',
+    }, {
+      allowSingleLineBlocks: true
+    }],
+    'arrow-parens': ['error', 'as-needed', { requireForBlockBody: true }],
+    'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    'no-plusplus': 'off',
+    'for-direction': 'off',
+    'no-nested-ternary': 'off',
+    '@typescript-eslint/member-delimiter-style': ['error', { // Prevents us from using any delimiter for interface properties.
+      'multiline': {
+        'delimiter': 'semi',
+        'requireLast': true
+      },
+      'singleline': {
+        'delimiter': 'semi',
+        'requireLast': false
+      }
+    }],
+    '@typescript-eslint/indent': 'off', // This is the job of StandardJS, they are competing rules so we turn off the Typescript one.
+    '@typescript-eslint/no-use-before-define': ['error', {
+      functions: false,
+      classes: false,
+    }]
   }
 };

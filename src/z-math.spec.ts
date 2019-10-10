@@ -10,14 +10,19 @@ describe('ZMath', () => {
 
   describe('sum()', () => {
     it('should throw TypeError on wrong arguments', () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       expect(() => zMath.sigmaSum(0)).to.throw(TypeError);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       expect(() => zMath.sigmaSum(() => 0)).to.throw(TypeError);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       expect(() => zMath.sigmaSum(1, 1, 1, () => 0)).to.throw(TypeError);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       expect(() => zMath.sigmaSum(1, [1], () => 0)).to.throw(TypeError);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       expect(() => zMath.sigmaSum([1], 1, () => 0)).to.throw(TypeError);
     });
