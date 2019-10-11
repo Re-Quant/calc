@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ETradeType } from './models';
 import { ZRisk } from './z-risk';
 import { ZMath } from './z-math';

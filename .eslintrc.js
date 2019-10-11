@@ -26,7 +26,7 @@ module.exports = {
     '@typescript-eslint/restrict-plus-operands': 'error',
     'import/no-extraneous-dependencies': [
       'error',
-      { devDependencies: ['**/*spec.ts'] },
+      { devDependencies: ['**/*spec.ts', 'src/chai/**/*.ts'] },
     ],
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-useless-constructor': 'error',
@@ -34,10 +34,15 @@ module.exports = {
     'filenames/match-regex': ['error', /^[0-9a-z.-]+$/, true],
     'consistent-return': 0,
     'no-unused-expressions': 0,
-    'indent': [
-      'warn',
-      2
-    ],
+    'indent': ['warn', 2, {
+      ObjectExpression: 'first',
+      CallExpression: { arguments: 'first' },
+      FunctionDeclaration: { parameters: 'first' },
+      ArrayExpression: 'first',
+      MemberExpression: 1,
+      SwitchCase: 1,
+      ignoredNodes: ['ConditionalExpression'],
+    }],
     'no-console': 'error',
     'no-return-await': 'error',
     'promise/catch-or-return': 'error',
@@ -85,6 +90,18 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': ['error', {
       functions: false,
       classes: false,
-    }]
+    }],
+    "object-curly-newline": ["error", {
+      "ImportDeclaration": { "multiline": true },
+      "ExportDeclaration": { "multiline": true }
+    }],
+    'operator-linebreak': ['error', 'before', {
+      overrides: { ':': 'ignore' },
+    }],
+    'object-property-newline': ['error', {
+      allowMultiplePropertiesPerLine: true,
+      allowAllPropertiesOnSameLine: true,
+    }],
+    'no-mixed-operators': 'off',
   }
 };

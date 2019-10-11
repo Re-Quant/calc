@@ -1,5 +1,5 @@
-// tslint:disable:no-unused-expression
-/* tslint:disable:space-in-parens */
+/* eslint-disable no-whitespace-before-property */
+/* eslint-disable space-in-parens */
 import { ZRisk } from './z-risk';
 import { zMath } from './z-math';
 import {
@@ -475,7 +475,7 @@ describe('ZRisk', () => {
         expect(marginCall.price).to.eq(0);
       });
 
-      function runLongIt(message: string, args: TradeInfoArgs) {
+      function runLongIt(message: string, args: TradeInfoArgs): void {
         it(message, () => {
           // arrange
           const vRiskExpected = args.deposit * args.risk;  /* ? */
@@ -969,7 +969,7 @@ describe('ZRisk', () => {
         expect(marginCall.price).to.floatEq(avgPrices.entry * 2);
       });
 
-      function runShortIt(message: string, args: TradeInfoArgs) {
+      function runShortIt(message: string, args: TradeInfoArgs): void {
         it(message, () => {
           // arrange
           const vRiskExpected = args.deposit * args.risk;  /* ? */
@@ -980,7 +980,7 @@ describe('ZRisk', () => {
           // assert
 
           const lossNoFee = tv.entries.orders.quoted * (
-              zMath.sumBy(entries, v => v.volumePart / v.price)
+              zMath.sumBy(entries, v => v.volumePart / v.price) // eslint-disable-line indent
             * zMath.sumBy(stops,   v => v.volumePart * v.price)
             - 1
           );
@@ -991,7 +991,7 @@ describe('ZRisk', () => {
           expect(vTotalLossQuoted / args.deposit).to.roundEq(tv.loss.percent);
 
           const profitNoFee = tv.stops.orders.quoted * (
-              1
+              1 // eslint-disable-line indent
             - zMath.sumBy(entries, v => v.volumePart / v.price)
             * zMath.sumBy(takes,   v => v.volumePart * v.price)
           ); /* ? */
@@ -1017,7 +1017,7 @@ describe('ZRisk', () => {
       }
     }); // end Short Trade describe()
 
-    function sumWithPreviousOrdersCheck(orders: TradeOrder[]) {
+    function sumWithPreviousOrdersCheck(orders: TradeOrder[]): void {
       const sum = {
         orders: { quoted: 0, base: 0 },
         fees:   { quoted: 0, base: 0 },
@@ -1033,7 +1033,7 @@ describe('ZRisk', () => {
       });
     }
 
-    function totalVolumeZeroCheck(totalVolume: TotalVolumeInfo) {
+    function totalVolumeZeroCheck(totalVolume: TotalVolumeInfo): void {
       expect(totalVolume.loss.quoted /* ? */).to.be.greaterThan(0);
       expect(totalVolume.loss.percent /* ? */).to.be.greaterThan(0);
       expect(totalVolume.profit.quoted /* ? */).to.be.greaterThan(0);
@@ -1211,8 +1211,8 @@ describe('ZRisk', () => {
         { price: 2000, volumePart: .15 },
         { price: 1000, volumePart: .1  },
       ];
-      const volumeBaseExpected =
-              zMath.sumBy(orders, v => volumeQuoted * v.volumePart / v.price);  /* ? */
+      const volumeBaseExpected
+              = zMath.sumBy(orders, v => volumeQuoted * v.volumePart / v.price);  /* ? */
 
       // act
       const avgPrice = zRisk.avgPriceOfQuoted(orders);  /* ? */
@@ -1228,8 +1228,8 @@ describe('ZRisk', () => {
       const orders: PriceAndVolumePart[] = [
         { price: 2000, volumePart: 1 },
       ];
-      const volumeBaseExpected =
-              zMath.sumBy(orders, v => volumeQuoted * v.volumePart / v.price);  /* ? */
+      const volumeBaseExpected
+              = zMath.sumBy(orders, v => volumeQuoted * v.volumePart / v.price);  /* ? */
 
       // act
       const avgPrice = zRisk.avgPriceOfQuoted(orders);  /* ? */
@@ -1251,8 +1251,8 @@ describe('ZRisk', () => {
         { price: 2000, volumePart: .15 },
         { price: 1000, volumePart: .1  },
       ];
-      const volumeQuotedExpected =
-              zMath.sumBy(orders, v => volumeBase * v.volumePart * v.price);  /* ? */
+      const volumeQuotedExpected
+              = zMath.sumBy(orders, v => volumeBase * v.volumePart * v.price);  /* ? */
 
       // act
       const avgPrice = zRisk.avgPriceOfBase(orders);  /* ? */
@@ -1268,8 +1268,8 @@ describe('ZRisk', () => {
       const orders: PriceAndVolumePart[] = [
         { price: 2000, volumePart: 1 },
       ];
-      const volumeQuotedExpected =
-              zMath.sumBy(orders, v => volumeBase * v.volumePart * v.price);  /* ? */
+      const volumeQuotedExpected
+              = zMath.sumBy(orders, v => volumeBase * v.volumePart * v.price);  /* ? */
 
       // act
       const avgPrice = zRisk.avgPriceOfBase(orders);  /* ? */

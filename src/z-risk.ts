@@ -36,7 +36,7 @@ export class ZRisk {
     const x = this.math.sumBy(entries, v => v.volumePart * v.fee);
     const y = this.math.sumBy(entries, v => v.volumePart / v.price)
       * (
-          this.math.sumBy(stops, v => v.volumePart * v.price * v.fee)
+          this.math.sumBy(stops, v => v.volumePart * v.price * v.fee) // eslint-disable-line indent
         - this.math.sumBy(stops, v => v.volumePart * v.price)
       );
 
@@ -161,7 +161,8 @@ export class ZRisk {
            ? {
              entry: this.avgPriceOfQuoted(p.entries),
              stop:  this.avgPriceOfBase(p.stops),
-             take:  this.avgPriceOfBase(p.takes), }
+             take:  this.avgPriceOfBase(p.takes),
+           }
            : {
              entry: this.avgPriceOfQuoted(p.entries),
              stop:  this.avgPriceOfQuoted(p.stops),
@@ -172,7 +173,7 @@ export class ZRisk {
   private getLongTradeOrdersInfo(p: OrdersInfoArg): OrdersInfo {
     const { Pe, Ie, Fe,
             Ps, Is, Fs,
-            Pt, It, Ft, } = p.flattenOrderGroups;
+            Pt, It, Ft } = p.flattenOrderGroups;
 
     // Entry Volume
     const vSumEntriesQ = p.totalTradeVolumeQuoted;  /* ? */
@@ -206,7 +207,7 @@ export class ZRisk {
       entriesBase,
       o => -1 * o.volume.fee.quoted,
       0,
-      p.deposit
+      p.deposit,
     );
     const stops = this.addDiffToTradeOrdersGroup(
       stopsBase,
@@ -248,7 +249,7 @@ export class ZRisk {
   private getShortTradeOrdersInfo(p: OrdersInfoArg): OrdersInfo {
     const { Pe, Ie, Fe,
             Ps, Is, Fs,
-            Pt, It, Ft, } = p.flattenOrderGroups;
+            Pt, It, Ft } = p.flattenOrderGroups;
 
     // Entry Volume
     const vSumEntriesQ = p.totalTradeVolumeQuoted;  /* ? */
@@ -285,7 +286,7 @@ export class ZRisk {
       entriesBase,
       o => -1 * o.volume.fee.quoted,
       0,
-      p.deposit
+      p.deposit,
     );
     const stops = this.addDiffToTradeOrdersGroup(
       stopsBase,
@@ -419,11 +420,11 @@ export class ZRisk {
       Ft[i] = o.fee;
     }
 
-    return {
+    return { /* eslint-disable object-property-newline */
       Pe, Ie, Fe,
       Ps, Is, Fs,
       Pt, It, Ft,
-    };
+    }; /* eslint-enable object-property-newline */
   }
 
 }

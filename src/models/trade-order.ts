@@ -30,6 +30,7 @@ export interface TradeOrderBase<T = TradeOrderVolume> extends TradeOrderArg {
   volume: T;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TradeOrder extends TradeOrderBase<TradeOrderVolume & {
   /**
    * Deposit change difference.

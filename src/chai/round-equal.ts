@@ -1,6 +1,7 @@
 import { AssertionType } from './assertion-type';
 
-export function roundEqualModule(_chai: any, utils: any) {
+export function roundEqualModule(_chai: any): void {
+  // eslint-disable-next-line prefer-destructuring
   const Assertion: AssertionType = _chai.Assertion;
 
   function round(value: number, precision: number): number {
@@ -8,8 +9,8 @@ export function roundEqualModule(_chai: any, utils: any) {
     return Math.round(value * multiplier) / multiplier;
   }
 
-  function roundEqual(this: any, expectedFloat: number, precision: number = 10) {
-    const actualFloat: any = this._obj;
+  function roundEqual(this: any, expectedFloat: number, precision = 10): void {
+    const actualFloat: any = this._obj; // eslint-disable-line no-underscore-dangle
 
     // first, our instanceof check, shortcut
     new Assertion(actualFloat).to.be.a('number');

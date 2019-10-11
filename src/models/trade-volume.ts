@@ -50,6 +50,7 @@ export interface TradeVolumeCommonInfoArgs<L = LeverageInfoArgs> extends Deposit
   maxTradeVolumeQuoted: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TradeVolumeCommonInfo extends TradeVolumeCommonInfoArgs<LeverageInfo> {
 }
 
