@@ -27,10 +27,13 @@
     "npm:version:update-minor": "VERSION_PART_NAME=minor npm run npm:version:update_",
     "npm:version:update-patch": "VERSION_PART_NAME=patch npm run npm:version:update_",
     "merge-tpl-repo": "tools/merge-with-repository-template.sh",
-    "prepush": "npm run lint && npm run test && npm run build:prod"
+    "tpl-repo": "tools/merge-with-repository-template.sh",
+    "tpl-repo:check": "npm run tpl-repo -- check",
+    "tpl-repo:merge": "npm run tpl-repo -- merge",
+    "prepush": "npm run lint && npm run test && npm run build:prod && npm run tpl-repo:check"
   },
   "devDependencies": {
-    "@types/chai": "~4.2.3",
+    "@types/chai": "~4.2.4",
     "@types/mocha": "~5.2.7",
     "@types/node": "~12.7.12",
     "@types/webpack": "~4.39.3",
@@ -58,8 +61,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn run prepush",
-      "post-merge": "yarn install"
+      "pre-push": "npm run prepush",
+      "post-merge": "IS_YARN=true yarn install"
     }
   }
 }
