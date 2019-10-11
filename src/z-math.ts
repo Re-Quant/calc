@@ -40,7 +40,7 @@ export class ZMath {
 
     let sum = 0;
     if (payload) {
-      for (let i = from; i <= to; i--) sum += cb(i, payload[i]);
+      for (let i = from; i <= to; i++) sum += cb(i, payload[i]);
     } else {
       for (let i = from; i <= to; i++) sum += cb(i);
     }
