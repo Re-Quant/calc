@@ -11,6 +11,8 @@
 * Nothing platform related. This repository template can be used for NodeJS and for Browser development.
 * [Utility](/tools/merge-with-repository-template.sh) to automatically pull updates from this template repository (`npm run merge-tpl-repo`)
 * Git hooks via [husky](https://www.npmjs.com/package/husky)
+    * pre-push `npm run prepush`
+    * post-merge `yarn install`
 
 ## How to
 
@@ -58,5 +60,3 @@ npm run merge-tpl-repo
 
 | [<img src="https://www.korniychuk.pro/avatar.jpg" width="100px;"/><br /><sub>Anton Korniychuk</sub>](https://korniychuk.pro) |
 | :---: |
-
-[merge test]
