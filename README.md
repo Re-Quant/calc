@@ -22,8 +22,6 @@ cd /code/z-brain
 git clone git@github.com:z-brain/calc.git calc
 cd calc
 yarn install
-
-npm run merge-tpl-repo
 ```
 
 ### How to use NodeJS version from the `.nvmrc`
