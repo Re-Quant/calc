@@ -58,3 +58,5 @@ npm run merge-tpl-repo
 
 | [<img src="https://www.korniychuk.pro/avatar.jpg" width="100px;"/><br /><sub>Anton Korniychuk</sub>](https://korniychuk.pro) |
 | :---: |
+
+[merge test]
