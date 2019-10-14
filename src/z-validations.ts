@@ -419,6 +419,7 @@ class ZValidations {
       );
     }
 
+    // TODO: special validation
     if (p.tradeType === ETradeType.Long) {
       if (p.entries) {
         p.stops.forEach((item: TradeOrderArg, i: number) => {
@@ -478,11 +479,15 @@ class ZValidations {
       : undefined;
   }
 
-  public validate(p: TradeInfoArgs) {
-    const isValidCommonFields = this.validateCommonFields(p);
-    const isValidEntries = this.validateEntries(p);
-    const isValidStops = this.validateStops(p);
-    const isValidTakes = this.validateTakes(p);
+  public validate(p: TradeInfoArgs): ValidationTradeErrors | void {
+    this.validateCommonFields(p);
+    this.validateEntries(p);
+    this.validateStops(p);
+    this.validateTakes(p);
+
+    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
+      ? this.errors
+      : undefined;
   }
 
   private cleanErrors(): void {
