@@ -464,14 +464,53 @@ class ZValidations {
   }
 
   public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | void {
-    if (!p.entries) {
+    if (!p.takes) {
       this.zErrorFactory.createErrorInfo(
-        ['takes', 0, 'entity'],
+        ['stops', 0, 'entity'],
         {
           message: this.messages.required(),
         },
         this.errors
       );
+    }
+
+    // TODO: special validation
+    if (p.tradeType === ETradeType.Long) {
+      if (p.entries) {
+        p.takes.forEach((item: TradeOrderArg, i: number) => {
+          p.entries.forEach((itemEntry) => {
+            if (item.price < itemEntry.price) {
+              this.zErrorFactory.createErrorInfo(
+                ['takes', i, 'price'],
+                {
+                  message: this.messages.biggerPrice(item.price, itemEntry.price),
+                  actual: item.price,
+                },
+                this.errors,
+              );
+            }
+          });
+        });
+      }
+    }
+
+    if (p.tradeType === ETradeType.Short) {
+      if (p.entries) {
+        p.takes.forEach((item: TradeOrderArg, i: number) => {
+          p.entries.forEach((itemEntry) => {
+            if (item.price > itemEntry.price) {
+              this.zErrorFactory.createErrorInfo(
+                ['takes', i, 'price'],
+                {
+                  message: this.messages.lessPrice(item.price, itemEntry.price),
+                  actual: item.price,
+                },
+                this.errors,
+              );
+            }
+          });
+        });
+      }
     }
 
     return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
