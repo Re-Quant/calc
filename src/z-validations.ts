@@ -103,10 +103,10 @@ class ZValidations {
     sumVolumeParts: () => 'should be equal \'1\'',
     minValue: (actual: number): string => `Value should be more then ${ actual }.`,
     maxValue: (actual: number): string => `Value should be less then ${ actual }.`,
-    lessPrice: (actual: number, comperingPrice: number): string =>
-      `Price ${ actual } should be less then ${ actual }.`,
-    biggerPrice: (actual: number, comperingPrice: number): string =>
-      `Price ${ actual } should be more then ${ actual }.`,
+    lessPrice: (actual: number): string =>
+      `Price should be less then ${ actual }.`,
+    biggerPrice: (actual: number): string =>
+      `Price should be more then ${ actual }.`,
   };
   public zErrorFactory: ZValidationErrorFactory;
 
