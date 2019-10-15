@@ -394,6 +394,8 @@ class ZValidations {
         },
         this.errors
       );
+
+      return this.errors;
     }
 
     p.entries.forEach(
@@ -417,7 +419,13 @@ class ZValidations {
         },
         this.errors
       );
+
+      return this.errors;
     }
+
+    p.stops.forEach(
+      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('stops', item, i),
+    );
 
     // TODO: special validation
     if (p.tradeType === ETradeType.Long) {
@@ -472,7 +480,13 @@ class ZValidations {
         },
         this.errors
       );
+
+      return this.errors;
     }
+
+    p.takes.forEach(
+      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('takes', item, i),
+    );
 
     // TODO: special validation
     if (p.tradeType === ETradeType.Long) {
