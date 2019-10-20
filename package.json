@@ -10,6 +10,7 @@
   "private": false,
   "scripts": {
     "preinstall": "node ./tools/check-yarn.js",
+    "pre-push": "npm run lint && npm run test && npm run build:prod && npm run tpl-repo:check",
     "webpack_": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
     "build:dev": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.dev.js  --progress --profile --trace-deprecation",
     "build:prod": "rimraf dist && npm run webpack_ -- --config config/webpack/webpack.prod.js --progress --profile --bail",
@@ -29,8 +30,7 @@
     "merge-tpl-repo": "tools/merge-with-repository-template.sh",
     "tpl-repo": "tools/merge-with-repository-template.sh",
     "tpl-repo:check": "npm run tpl-repo -- check",
-    "tpl-repo:merge": "npm run tpl-repo -- merge",
-    "pre-push": "npm run lint && npm run test && npm run build:prod && npm run tpl-repo:check"
+    "tpl-repo:merge": "npm run tpl-repo -- merge"
   },
   "devDependencies": {
     "@types/chai": "~4.2.3",
