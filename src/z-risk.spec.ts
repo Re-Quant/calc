@@ -418,7 +418,7 @@ describe('ZRisk', () => {
           // checking percentages
           expect(o.volume.diff.total.percent).to.roundEq(o.volume.diff.total.quoted / args.deposit);
           expect(o.volume.diff.current.percent)
-            .to.roundEq(o.volume.diff.current.quoted / args.deposit);
+              .to.roundEq(o.volume.diff.current.quoted / args.deposit);
         });
         stops.forEach((o) => {
           expect(o.volume.diff.current.quoted).to.be.lessThan(0);
@@ -429,7 +429,7 @@ describe('ZRisk', () => {
           // checking percentages
           expect(o.volume.diff.total.percent).to.roundEq(o.volume.diff.total.quoted / args.deposit);
           expect(o.volume.diff.current.percent)
-            .to.roundEq(o.volume.diff.current.quoted / args.deposit);
+              .to.roundEq(o.volume.diff.current.quoted / args.deposit);
         });
         takes.forEach((o) => {
           expect(o.volume.diff.current.quoted).to.be.greaterThan(0);
@@ -440,7 +440,7 @@ describe('ZRisk', () => {
           // checking percentages
           expect(o.volume.diff.total.percent).to.roundEq(o.volume.diff.total.quoted / args.deposit);
           expect(o.volume.diff.current.percent)
-            .to.roundEq(o.volume.diff.current.quoted / args.deposit);
+              .to.roundEq(o.volume.diff.current.quoted / args.deposit);
         });
 
         // comparing with already known volume totals
@@ -912,7 +912,7 @@ describe('ZRisk', () => {
           // checking percentages
           expect(o.volume.diff.total.percent).to.roundEq(o.volume.diff.total.quoted / args.deposit);
           expect(o.volume.diff.current.percent)
-            .to.roundEq(o.volume.diff.current.quoted / args.deposit);
+              .to.roundEq(o.volume.diff.current.quoted / args.deposit);
         });
         stops.forEach((o) => {
           expect(o.volume.diff.current.quoted).to.be.lessThan(0);
@@ -923,7 +923,7 @@ describe('ZRisk', () => {
           // checking percentages
           expect(o.volume.diff.total.percent).to.roundEq(o.volume.diff.total.quoted / args.deposit);
           expect(o.volume.diff.current.percent)
-            .to.roundEq(o.volume.diff.current.quoted / args.deposit);
+              .to.roundEq(o.volume.diff.current.quoted / args.deposit);
         });
         takes.forEach((o) => {
           expect(o.volume.diff.current.quoted).to.be.greaterThan(0);
@@ -934,7 +934,7 @@ describe('ZRisk', () => {
           // checking percentages
           expect(o.volume.diff.total.percent).to.roundEq(o.volume.diff.total.quoted / args.deposit);
           expect(o.volume.diff.current.percent)
-            .to.roundEq(o.volume.diff.current.quoted / args.deposit);
+              .to.roundEq(o.volume.diff.current.quoted / args.deposit);
         });
 
         // comparing with already known volume totals

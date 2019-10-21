@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as chai from 'chai';
 import { floatEqualModule } from './float-equal';
 import { roundEqualModule } from './round-equal';
