@@ -12,13 +12,14 @@ export interface BreakevenTradeInfoArgs<T = BreakevenInfoArgs> {
   breakeven: T;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface BreakevenTradeInfo extends BreakevenTradeInfoArgs<BreakevenInfo> {}
 
 export interface BreakevenPriceArgs extends BreakevenTradeInfoArgs {
   totalVolume: {
     entries: {
       orders: { quoted: number; base: number };
-      fees: { quoted: number  };
+      fees: { quoted: number };
     };
   };
 }
