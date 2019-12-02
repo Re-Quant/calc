@@ -110,8 +110,6 @@ class ZValidations {
   };
   public zErrorFactory: ZValidationErrorFactory;
 
-  private errors: ValidationTradeErrors = {} as any;
-
   constructor() {
     this.zErrorFactory = new ZValidationErrorFactory();
   }
@@ -156,6 +154,7 @@ class ZValidations {
   }
 
   public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | void {
+    const errors: ValidationTradeErrors = {} as any;
     // deposit
     if (!p.deposit && !this.isDefined(p.deposit)) {
       this.zErrorFactory.createErrorInfo(
@@ -163,7 +162,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -173,7 +172,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -184,7 +183,7 @@ class ZValidations {
           message: this.messages.minValue(p.deposit),
           actual: p.deposit,
         },
-        this.errors
+        errors
       );
     }
 
@@ -195,7 +194,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -205,7 +204,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -216,7 +215,7 @@ class ZValidations {
           message: this.messages.minValue(p.risk),
           actual: p.risk,
         },
-        this.errors
+        errors
       );
     }
 
@@ -227,7 +226,7 @@ class ZValidations {
           message: this.messages.maxValue(p.risk),
           actual: p.risk,
         },
-        this.errors
+        errors
       );
     }
 
@@ -239,7 +238,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -249,7 +248,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -263,7 +262,7 @@ class ZValidations {
           message: this.messages.minValue(p.risk),
           actual: p.maxTradeVolumeQuoted,
         },
-        this.errors
+        errors
       );
     }
 
@@ -274,7 +273,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -284,7 +283,7 @@ class ZValidations {
         {
           message: this.messages.boolean(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -294,7 +293,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -304,7 +303,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -319,7 +318,7 @@ class ZValidations {
           message: this.messages.minValue(p.leverage.max),
           actual: p.leverage.max,
         },
-        this.errors
+        errors
       );
     }
 
@@ -334,7 +333,7 @@ class ZValidations {
           message: this.messages.maxValue(p.leverage.max),
           actual: p.leverage.max,
         },
-        this.errors
+        errors
       );
     }
 
@@ -345,7 +344,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -355,7 +354,7 @@ class ZValidations {
         {
           message: this.messages.string(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -366,7 +365,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -376,51 +375,77 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
-    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
-      ? this.errors
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? errors
       : undefined;
   }
 
   public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | void {
+    const errors: ValidationTradeErrors = {} as any;
+
     if (!p.entries) {
       this.zErrorFactory.createErrorInfo(
         ['entries', 0, 'entity'],
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
 
-      return this.errors;
+      return errors;
     }
 
     p.entries.forEach(
       (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('entries', item, i),
     );
 
-    // TODO: maybe need to return result from checkSumVolumeParts
-    this.checkSumVolumeParts(p);
+    // checkSumVolumeParts
+    if (!p.entries) {
+      this.zErrorFactory.createErrorInfo(
+        ['entries', 0, 'entity'],
+        {
+          message: this.messages.required(),
+        },
+        errors
+      );
+    }
 
-    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
-      ? this.errors
+    // TODO: why equal '1'
+    // Need to use eq
+    const sumVolumeParts = p.entries.reduce((acc, val) => acc + val.volumePart);
+
+    if (sumVolumeParts > 1) {
+      this.zErrorFactory.createErrorInfo(
+        ['entries', 0, 'entity'],
+        {
+          message: this.messages.sumVolumeParts(),
+        },
+        errors
+      );
+    }
+
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? errors
       : undefined;
   }
 
   public validateStops(p: TradeInfoArgs): ValidationTradeErrors | void {
+    const errors: ValidationTradeErrors = {} as any;
+
     if (!p.stops) {
       this.zErrorFactory.createErrorInfo(
         ['stops', 0, 'entity'],
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
 
-      return this.errors;
+      return errors;
     }
 
     p.stops.forEach(
@@ -439,7 +464,7 @@ class ZValidations {
                   message: this.messages.lessPrice(item.price, itemEntry.price),
                   actual: item.price,
                 },
-                this.errors,
+                errors,
               );
             }
           });
@@ -458,7 +483,7 @@ class ZValidations {
                   message: this.messages.biggerPrice(item.price, itemEntry.price),
                   actual: item.price,
                 },
-                this.errors,
+                errors,
               );
             }
           });
@@ -466,22 +491,24 @@ class ZValidations {
       }
     }
 
-    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
-      ? this.errors
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? errors
       : undefined;
   }
 
   public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | void {
+    const errors: ValidationTradeErrors = {} as any;
+
     if (!p.takes) {
       this.zErrorFactory.createErrorInfo(
         ['stops', 0, 'entity'],
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
 
-      return this.errors;
+      return errors;
     }
 
     p.takes.forEach(
@@ -500,7 +527,7 @@ class ZValidations {
                   message: this.messages.biggerPrice(item.price, itemEntry.price),
                   actual: item.price,
                 },
-                this.errors,
+                errors,
               );
             }
           });
@@ -519,7 +546,7 @@ class ZValidations {
                   message: this.messages.lessPrice(item.price, itemEntry.price),
                   actual: item.price,
                 },
-                this.errors,
+                errors,
               );
             }
           });
@@ -527,53 +554,31 @@ class ZValidations {
       }
     }
 
-    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
-      ? this.errors
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? errors
       : undefined;
   }
 
   public validate(p: TradeInfoArgs): ValidationTradeErrors | void {
-    this.validateCommonFields(p);
-    this.validateEntries(p);
-    this.validateStops(p);
-    this.validateTakes(p);
+    let errors: ValidationTradeErrors;
 
-    return Object.entries(this.errors).length === 0 && this.errors.constructor === Object
-      ? this.errors
+    const commonFieldsErrors = this.validateCommonFields(p);
+    const entriesErrors = this.validateEntries(p);
+    const stopsErrors = this.validateStops(p);
+    const takesErrors = this.validateTakes(p);
+
+    errors = { ...commonFieldsErrors, ...entriesErrors, ...stopsErrors, ...takesErrors };
+
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? errors
       : undefined;
   }
 
-  private cleanErrors(): void {
-    this.errors = {} as any;
-  }
-
-  private checkSumVolumeParts(p: TradeInfoArgs): void {
-    if (!p.entries) {
-      this.zErrorFactory.createErrorInfo(
-        ['entries', 0, 'entity'],
-        {
-          message: this.messages.required(),
-        },
-        this.errors
-      );
-    }
-
-    // TODO: why equal '1'
-    const sumVolumeParts = p.entries.reduce((acc, val) => acc + val.volumePart);
-
-    if (sumVolumeParts > 1) {
-      this.zErrorFactory.createErrorInfo(
-        ['entries', 0, 'entity'],
-        {
-          message: this.messages.sumVolumeParts(),
-        },
-        this.errors
-      );
-    }
-  }
-
   // TODO: need to set up type for entityName
+  // need to create type = '' | '' | ''
   private validateOrderBaseScenario(entityName, item: TradeOrderArg, i: number): void {
+    const errors: ValidationTradeErrors = {} as any;
+
     // price
     if (!item.price) {
       this.zErrorFactory.createErrorInfo(
@@ -581,7 +586,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -591,7 +596,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -605,7 +610,7 @@ class ZValidations {
           message: this.messages.minValue(item.price),
           actual: item.price,
         },
-        this.errors
+        errors
       );
     }
 
@@ -618,7 +623,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -628,7 +633,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -642,7 +647,7 @@ class ZValidations {
           message: this.messages.minValue(item.volumePart),
           actual: item.volumePart,
         },
-        this.errors
+        errors
       );
     }
 
@@ -656,7 +661,7 @@ class ZValidations {
           message: this.messages.maxValue(item.volumePart),
           actual: item.volumePart,
         },
-        this.errors
+        errors
       );
     }
 
@@ -667,7 +672,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -677,7 +682,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        this.errors
+        errors
       );
     }
 
@@ -691,11 +696,10 @@ class ZValidations {
           message: this.messages.minValue(item.fee),
           actual: item.fee,
         },
-        this.errors
+        errors
       );
     }
 
-    // TODO: ??? max for fee
     if (item.fee
       && this.isNumber(item.fee)
       && !this.max(item.fee, 1)
@@ -706,7 +710,7 @@ class ZValidations {
           message: this.messages.maxValue(item.fee),
           actual: item.fee,
         },
-        this.errors
+        errors
       );
     }
   }
