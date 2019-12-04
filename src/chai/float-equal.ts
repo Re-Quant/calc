@@ -1,10 +1,11 @@
 import { AssertionType } from './assertion-type';
 
-export function floatEqualModule(_chai: any, utils: any) {
+export function floatEqualModule(_chai: any): void {
+  // eslint-disable-next-line prefer-destructuring
   const Assertion: AssertionType = _chai.Assertion;
 
-  function floatEqual(this: any, expectedFloat: number) {
-    const actualFloat: any = this._obj;
+  function floatEqual(this: any, expectedFloat: number): void {
+    const actualFloat: any = this._obj; // eslint-disable-line no-underscore-dangle
 
     // first, our instanceof check, shortcut
     new Assertion(actualFloat).to.be.a('number');

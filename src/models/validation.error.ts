@@ -7,11 +7,10 @@ export enum ValidationCodes {
   RelationWithEntries = 'relationWithEntries',
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ZValidators {
   public static min(min: number) {
-    return (value: any) => {
-      return value < min;
-    };
+    return (value: any): boolean => value < min;
   }
 }
 

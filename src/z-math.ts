@@ -23,21 +23,17 @@ export class ZMath {
 
     if (typeof args[0] === 'number') {
       if (typeof args[1] === 'number' && typeof args[2] === 'function') {
-        from = args[0];
-        to   = args[1];
-        cb   = args[2];
+        [from, to, cb] = args;
       } else if (typeof args[1] === 'function') {
         from = 0;
-        to = args[0];
-        cb   = args[1];
+        [to, cb] = args;
       } else {
         throw new TypeError('ZMath.sum() Wrong arguments');
       }
     } else if (args[0] instanceof Array && typeof args[1] === 'function') {
-      payload = args[0] as any[];
+      [payload, cb] = args;
       from = 0;
-      to = payload.length - 1;
-      cb = args[1];
+      to = payload!.length - 1;
     } else {
       throw new TypeError('ZMath.sum() Wrong arguments');
     }
