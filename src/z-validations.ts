@@ -41,33 +41,11 @@ export interface ValidationTradeErrors {
 }
 
 class ZValidationErrorFactory {
-  public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O>(
-    keys: [K1],
-    value: ErrorInfo,
-    model: O,
-  ): O[K1];
-
-  public createErrorInfo<
-    O extends ValidationTradeErrors,
-    K1 extends keyof O,
-    K2 extends keyof Required<O>[K1]
-    >(
-    keys: [K1, K2],
-    value: ErrorInfo,
-    model: O,
-  ): O[K1][K2];
-
-  public createErrorInfo<
-    O extends ValidationTradeErrors,
-    K1 extends keyof O,
-    K2 extends keyof Required<O>[K1],
-    K3 extends keyof Required<O>[K2],
-    >(
-    keys: [K1, K2, K3],
-    value: ErrorInfo,
-    model: O,
-  ): O[K1][K2][K3];
-
+  /* eslint-disable max-len */
+  public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O>(keys: [K1], value: ErrorInfo, model: O): O[K1];
+  public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof Required<O>[K1]>(keys: [K1, K2], value: ErrorInfo, model: O): O[K1][K2];
+  public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof Required<O>[K1], K3 extends keyof Required<O>[K2]>(keys: [K1, K2, K3], value: ErrorInfo, model: O): O[K1][K2][K3];
+  /* eslint-enable max-len */
   public createErrorInfo<O extends ValidationTradeErrors>(
     keys: string[],
     value: ErrorInfo,
