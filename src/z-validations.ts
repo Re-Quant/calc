@@ -1,7 +1,7 @@
 import {
   TradeInfoArgs,
   ETradeType,
-  TradeOrderArg
+  TradeOrderArg,
 } from './models';
 
 export interface ErrorInfo {
@@ -46,6 +46,7 @@ class ZValidationErrorFactory {
     value: ErrorInfo,
     model: O,
   ): O[K1];
+
   public createErrorInfo<
     O extends ValidationTradeErrors,
     K1 extends keyof O,
@@ -55,6 +56,7 @@ class ZValidationErrorFactory {
     value: ErrorInfo,
     model: O,
   ): O[K1][K2];
+
   public createErrorInfo<
     O extends ValidationTradeErrors,
     K1 extends keyof O,
@@ -65,6 +67,7 @@ class ZValidationErrorFactory {
     value: ErrorInfo,
     model: O,
   ): O[K1][K2][K3];
+
   public createErrorInfo<O extends ValidationTradeErrors>(
     keys: string[],
     value: ErrorInfo,
@@ -103,11 +106,10 @@ class ZValidations {
     sumVolumeParts: () => 'should be equal \'1\'',
     minValue: (actual: number): string => `Value should be more then ${ actual }.`,
     maxValue: (actual: number): string => `Value should be less then ${ actual }.`,
-    lessPrice: (actual: number, comperingPrice: number): string =>
-      `Price ${ actual } should be less then ${ comperingPrice }.`,
-    biggerPrice: (actual: number, comperingPrice: number): string =>
-      `Price ${ actual } should be more then ${ comperingPrice }.`,
+    lessPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be less then ${ comperingPrice }.`,
+    biggerPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be more then ${ comperingPrice }.`,
   };
+
   public zErrorFactory: ZValidationErrorFactory;
 
   constructor() {
@@ -120,7 +122,7 @@ class ZValidations {
 
   public isNumber(value: unknown, options: IsNumberOptions = {
     allowNaN: false,
-    allowInfinity: false
+    allowInfinity: false,
   }): boolean {
     if (typeof value !== 'number') {
       return false;
@@ -162,7 +164,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -172,7 +174,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -183,7 +185,7 @@ class ZValidations {
           message: this.messages.minValue(p.deposit),
           actual: p.deposit,
         },
-        errors
+        errors,
       );
     }
 
@@ -194,7 +196,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -204,7 +206,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -215,7 +217,7 @@ class ZValidations {
           message: this.messages.minValue(p.risk),
           actual: p.risk,
         },
-        errors
+        errors,
       );
     }
 
@@ -226,7 +228,7 @@ class ZValidations {
           message: this.messages.maxValue(p.risk),
           actual: p.risk,
         },
-        errors
+        errors,
       );
     }
 
@@ -238,7 +240,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -248,7 +250,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -262,7 +264,7 @@ class ZValidations {
           message: this.messages.minValue(p.risk),
           actual: p.maxTradeVolumeQuoted,
         },
-        errors
+        errors,
       );
     }
 
@@ -273,7 +275,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -283,7 +285,7 @@ class ZValidations {
         {
           message: this.messages.boolean(),
         },
-        errors
+        errors,
       );
     }
 
@@ -293,7 +295,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -303,7 +305,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -318,7 +320,7 @@ class ZValidations {
           message: this.messages.minValue(p.leverage.max),
           actual: p.leverage.max,
         },
-        errors
+        errors,
       );
     }
 
@@ -333,7 +335,7 @@ class ZValidations {
           message: this.messages.maxValue(p.leverage.max),
           actual: p.leverage.max,
         },
-        errors
+        errors,
       );
     }
 
@@ -344,7 +346,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -354,7 +356,7 @@ class ZValidations {
         {
           message: this.messages.string(),
         },
-        errors
+        errors,
       );
     }
 
@@ -365,7 +367,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -375,7 +377,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -393,7 +395,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
 
       return errors;
@@ -410,7 +412,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -424,7 +426,7 @@ class ZValidations {
         {
           message: this.messages.sumVolumeParts(),
         },
-        errors
+        errors,
       );
     }
 
@@ -442,7 +444,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
 
       return errors;
@@ -505,7 +507,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
 
       return errors;
@@ -586,7 +588,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -596,7 +598,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -610,7 +612,7 @@ class ZValidations {
           message: this.messages.minValue(item.price),
           actual: item.price,
         },
-        errors
+        errors,
       );
     }
 
@@ -623,7 +625,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -633,7 +635,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -647,7 +649,7 @@ class ZValidations {
           message: this.messages.minValue(item.volumePart),
           actual: item.volumePart,
         },
-        errors
+        errors,
       );
     }
 
@@ -661,7 +663,7 @@ class ZValidations {
           message: this.messages.maxValue(item.volumePart),
           actual: item.volumePart,
         },
-        errors
+        errors,
       );
     }
 
@@ -672,7 +674,7 @@ class ZValidations {
         {
           message: this.messages.required(),
         },
-        errors
+        errors,
       );
     }
 
@@ -682,7 +684,7 @@ class ZValidations {
         {
           message: this.messages.number(),
         },
-        errors
+        errors,
       );
     }
 
@@ -696,7 +698,7 @@ class ZValidations {
           message: this.messages.minValue(item.fee),
           actual: item.fee,
         },
-        errors
+        errors,
       );
     }
 
@@ -710,7 +712,7 @@ class ZValidations {
           message: this.messages.maxValue(item.fee),
           actual: item.fee,
         },
-        errors
+        errors,
       );
     }
   }
