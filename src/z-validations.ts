@@ -46,7 +46,6 @@ class ZValidationErrorFactory {
   public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O>(keys: [K1], value: ErrorInfo, model: O): O[K1];
   public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof Required<O>[K1]>(keys: [K1, K2], value: ErrorInfo, model: O): O[K1][K2];
   public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O, K2 extends keyof Required<O>[K1], K3 extends keyof Required<O>[K1][K2]>(keys: [K1, K2, K3], value: ErrorInfo, model: O): O[K1][K2][K3];
-  /* eslint-enable max-len */
   public createErrorInfo<O extends ValidationTradeErrors>(
     keys: string[],
     value: ErrorInfo,
@@ -55,6 +54,7 @@ class ZValidationErrorFactory {
     let currentObject: any = model;
 
     // tslint:disable-next-line:forin
+    // eslint-disable-next-line @typescript-eslint/no-for-in-array,guard-for-in,no-restricted-syntax
     for (const i in keys) {
       const key = keys[i];
       const length = keys.length - 1;
