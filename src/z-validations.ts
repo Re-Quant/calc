@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import {
   TradeInfoArgs,
   ETradeType,
@@ -540,14 +541,14 @@ class ZValidations {
   }
 
   public validate(p: TradeInfoArgs): ValidationTradeErrors | void {
-    let errors: ValidationTradeErrors;
-
     const commonFieldsErrors = this.validateCommonFields(p);
     const entriesErrors = this.validateEntries(p);
     const stopsErrors = this.validateStops(p);
     const takesErrors = this.validateTakes(p);
 
-    errors = { ...commonFieldsErrors, ...entriesErrors, ...stopsErrors, ...takesErrors };
+    const errors: ValidationTradeErrors = {
+      ...commonFieldsErrors, ...entriesErrors, ...stopsErrors, ...takesErrors,
+    };
 
     return Object.entries(errors).length === 0 && errors.constructor === Object
       ? errors
