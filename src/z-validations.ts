@@ -78,11 +78,11 @@ class ZValidationErrorFactory {
 // tslint:disable-next-line:max-classes-per-file
 class ZValidations {
   public messages = {
-    required: () => 'required field',
-    number: () => 'should be a number',
-    string: () => 'should be a string',
-    boolean: () => 'should be a boolean',
-    sumVolumeParts: () => 'should be equal \'1\'',
+    required: (): string => 'required field',
+    number: (): string => 'should be a number',
+    string: (): string => 'should be a string',
+    boolean: (): string => 'should be a boolean',
+    sumVolumeParts: (): string => 'should be equal \'1\'',
     minValue: (actual: number): string => `Value should be more then ${ actual }.`,
     maxValue: (actual: number): string => `Value should be less then ${ actual }.`,
     lessPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be less then ${ comperingPrice }.`,
