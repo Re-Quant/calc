@@ -41,6 +41,9 @@ export interface ValidationTradeErrors {
   takes?: TradeOrderErrors;
 }
 
+/* eslint-disable max-len */
+export type EntityName = 'entries' | 'stops' | 'takes' | 'breakeven' | 'deposit' | 'risk' | 'leverage' | 'maxTradeVolumeQuoted' | 'tradeType';
+
 class ZValidationErrorFactory {
   /* eslint-disable max-len */
   public createErrorInfo<O extends ValidationTradeErrors, K1 extends keyof O>(keys: [K1], value: ErrorInfo, model: O): O[K1];
@@ -557,7 +560,7 @@ class ZValidations {
 
   // TODO: need to set up type for entityName
   // need to create type = '' | '' | ''
-  private validateOrderBaseScenario(entityName, item: TradeOrderArg, i: number): void {
+  private validateOrderBaseScenario(entityName: any, item: TradeOrderArg, i: number): void {
     const errors: ValidationTradeErrors = {} as any;
 
     // price
