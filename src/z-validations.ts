@@ -204,7 +204,7 @@ export class ZValidations {
       );
     }
 
-    if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 1)) {
+    if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 0.1)) {
       this.zErrorFactory.createErrorInfo(
         ['risk'],
         {
