@@ -333,7 +333,7 @@ export class ZValidations {
       );
     }
 
-    if (p.tradeType && Object.values(ETradeType).includes(p.tradeType)) {
+    if (p.tradeType && !(Object.values(ETradeType).includes(p.tradeType))) {
       this.zErrorFactory.createErrorInfo(
         ['tradeType'],
         {
@@ -364,9 +364,9 @@ export class ZValidations {
       );
     }
 
-    return Object.entries(errors).length > 0 && errors.constructor === Object
-      ? errors
-      : undefined;
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? undefined
+      : errors;
   }
 
   public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | undefined {
@@ -413,9 +413,9 @@ export class ZValidations {
       );
     }
 
-    return Object.entries(errors).length > 0 && errors.constructor === Object
-      ? errors
-      : undefined;
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? undefined
+      : errors;
   }
 
   public validateStops(p: TradeInfoArgs): ValidationTradeErrors | undefined {
@@ -476,9 +476,9 @@ export class ZValidations {
       }
     }
 
-    return Object.entries(errors).length > 0 && errors.constructor === Object
-      ? errors
-      : undefined;
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? undefined
+      : errors;
   }
 
   public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | undefined {
@@ -539,9 +539,9 @@ export class ZValidations {
       }
     }
 
-    return Object.entries(errors).length > 0 && errors.constructor === Object
-      ? errors
-      : undefined;
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? undefined
+      : errors;
   }
 
   public validate(p: TradeInfoArgs): ValidationTradeErrors | undefined {
@@ -554,9 +554,11 @@ export class ZValidations {
       ...commonFieldsErrors, ...entriesErrors, ...stopsErrors, ...takesErrors,
     };
 
-    return Object.entries(errors).length > 0 && errors.constructor === Object
-      ? errors
-      : undefined;
+    console.log('---', errors);
+
+    return Object.entries(errors).length === 0 && errors.constructor === Object
+      ? undefined
+      : errors;
   }
 
   // TODO: need to set up type for entityName
