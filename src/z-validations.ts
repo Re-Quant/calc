@@ -79,7 +79,7 @@ class ZValidationErrorFactory {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class ZValidations {
+export class ZValidations {
   public messages = {
     required: (): string => 'required field',
     number: (): string => 'should be a number',
@@ -90,6 +90,7 @@ class ZValidations {
     maxValue: (actual: number): string => `Value should be less then ${ actual }.`,
     lessPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be less then ${ comperingPrice }.`,
     biggerPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be more then ${ comperingPrice }.`,
+    wrongTradeType: () => 'Wrong trade type',
   };
 
   public zErrorFactory: ZValidationErrorFactory;
@@ -137,7 +138,7 @@ class ZValidations {
     return value <= maxValue;
   }
 
-  public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | void {
+  public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | undefined {
     const errors: ValidationTradeErrors = {} as any;
     // deposit
     if (!p.deposit && !this.isDefined(p.deposit)) {
@@ -332,11 +333,11 @@ class ZValidations {
       );
     }
 
-    if (p.tradeType && !this.isString(p.tradeType)) {
+    if (p.tradeType && Object.values(ETradeType).includes(p.tradeType)) {
       this.zErrorFactory.createErrorInfo(
         ['tradeType'],
         {
-          message: this.messages.string(),
+          message: this.messages.wrongTradeType(),
         },
         errors,
       );
@@ -368,7 +369,7 @@ class ZValidations {
       : undefined;
   }
 
-  public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | void {
+  public validateEntries(p: TradeInfoArgs): ValidationTradeErrors | undefined {
     const errors: ValidationTradeErrors = {} as any;
 
     if (!p.entries) {
@@ -417,7 +418,7 @@ class ZValidations {
       : undefined;
   }
 
-  public validateStops(p: TradeInfoArgs): ValidationTradeErrors | void {
+  public validateStops(p: TradeInfoArgs): ValidationTradeErrors | undefined {
     const errors: ValidationTradeErrors = {} as any;
 
     if (!p.stops) {
@@ -480,7 +481,7 @@ class ZValidations {
       : undefined;
   }
 
-  public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | void {
+  public validateTakes(p: TradeInfoArgs): ValidationTradeErrors | undefined {
     const errors: ValidationTradeErrors = {} as any;
 
     if (!p.takes) {
@@ -543,7 +544,7 @@ class ZValidations {
       : undefined;
   }
 
-  public validate(p: TradeInfoArgs): ValidationTradeErrors | void {
+  public validate(p: TradeInfoArgs): ValidationTradeErrors | undefined {
     const commonFieldsErrors = this.validateCommonFields(p);
     const entriesErrors = this.validateEntries(p);
     const stopsErrors = this.validateStops(p);
@@ -553,7 +554,7 @@ class ZValidations {
       ...commonFieldsErrors, ...entriesErrors, ...stopsErrors, ...takesErrors,
     };
 
-    return Object.entries(errors).length === 0 && errors.constructor === Object
+    return Object.entries(errors).length > 0 && errors.constructor === Object
       ? errors
       : undefined;
   }
