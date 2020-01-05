@@ -9,42 +9,41 @@ describe('ZValidations', () => {
   });
 
   describe('validate', () => {
-    const testData = {
-      deposit: 1000,
-      risk: 0.01,
-      leverage: {
-        allow: true,
-        max: 5,
-      },
-      tradeType: ETradeType.Long,
-      breakeven: {
-        fee: 0.001,
-      },
-      entries: [
-        {
-          price: 100,
-          volumePart: 1,
-          fee: 0.002,
+    it('should pass validation', () => {
+      const testData = {
+        deposit: 1000,
+        risk: 0.01,
+        leverage: {
+          allow: true,
+          max: 5,
         },
-      ],
-      stops: [
-        {
-          price: 90,
-          volumePart: 1,
+        tradeType: ETradeType.Long,
+        breakeven: {
           fee: 0.001,
         },
-      ],
-      takes: [
-        {
-          price: 150,
-          volumePart: 1,
-          fee: 0.002,
-        },
-      ],
-      maxTradeVolumeQuoted: 5000,
-    };
-
-    it('should pass validation', () => {
+        entries: [
+          {
+            price: 100,
+            volumePart: 1,
+            fee: 0.002,
+          },
+        ],
+        stops: [
+          {
+            price: 90,
+            volumePart: 1,
+            fee: 0.001,
+          },
+        ],
+        takes: [
+          {
+            price: 150,
+            volumePart: 1,
+            fee: 0.002,
+          },
+        ],
+        maxTradeVolumeQuoted: 5000,
+      };
       expect(zValidationsMock.validate(testData)).to.equal(undefined);
     });
 
@@ -87,7 +86,7 @@ describe('ZValidations', () => {
             maxTradeVolumeQuoted: 5000,
           };
           expect(zValidationsMock.validate(testData)).to.eql(
-            { deposit: { message: 'Value should be more then -1.', actual: -1 } }
+            { deposit: { message: 'Value should be more then -1.', actual: -1 } },
           );
         });
       });
@@ -175,7 +174,7 @@ describe('ZValidations', () => {
           };
 
           expect(zValidationsMock.validate(testData)).to.eql(
-            { risk: { message: `Value should be more then -0.01.`, actual: -0.01 } }
+            { risk: { message: 'Value should be more then -0.01.', actual: -0.01 } },
           );
         });
 
@@ -217,7 +216,7 @@ describe('ZValidations', () => {
           };
 
           expect(zValidationsMock.validate(testData)).to.eql(
-            { risk: { message: `Value should be less then 0.2.`, actual: 0.2 } }
+            { risk: { message: 'Value should be less then 0.2.', actual: 0.2 } },
           );
         });
       });
