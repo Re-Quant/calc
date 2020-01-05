@@ -554,8 +554,6 @@ export class ZValidations {
       ...commonFieldsErrors, ...entriesErrors, ...stopsErrors, ...takesErrors,
     };
 
-    console.log('---', errors);
-
     return Object.entries(errors).length === 0 && errors.constructor === Object
       ? undefined
       : errors;
