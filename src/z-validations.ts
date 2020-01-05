@@ -364,7 +364,7 @@ export class ZValidations {
       );
     }
 
-    return Object.entries(errors).length === 0 && errors.constructor === Object
+    return Object.entries(errors).length > 0 && errors.constructor === Object
       ? errors
       : undefined;
   }
@@ -413,7 +413,7 @@ export class ZValidations {
       );
     }
 
-    return Object.entries(errors).length === 0 && errors.constructor === Object
+    return Object.entries(errors).length > 0 && errors.constructor === Object
       ? errors
       : undefined;
   }
@@ -476,7 +476,7 @@ export class ZValidations {
       }
     }
 
-    return Object.entries(errors).length === 0 && errors.constructor === Object
+    return Object.entries(errors).length > 0 && errors.constructor === Object
       ? errors
       : undefined;
   }
@@ -539,7 +539,7 @@ export class ZValidations {
       }
     }
 
-    return Object.entries(errors).length === 0 && errors.constructor === Object
+    return Object.entries(errors).length > 0 && errors.constructor === Object
       ? errors
       : undefined;
   }
