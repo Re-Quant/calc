@@ -220,6 +220,49 @@ describe('ZValidations', () => {
           );
         });
       });
+
+      describe('Max trade volume', () => {
+        it(`WHEN: send data with wrong value in deposit field
+            THEN: should return validation error`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: -1,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { maxTradeVolumeQuoted: { message: 'Value should be more then -1.', actual: -1 } },
+          );
+        });
+      });
     });
   });
 });

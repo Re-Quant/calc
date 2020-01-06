@@ -216,17 +216,6 @@ export class ZValidations {
     }
 
     // maxTradeVolumeQuoted
-    // TODO: ???
-    if (!p.maxTradeVolumeQuoted && !this.isDefined(p.maxTradeVolumeQuoted)) {
-      this.zErrorFactory.createErrorInfo(
-        ['maxTradeVolumeQuoted'],
-        {
-          message: this.messages.required(),
-        },
-        errors,
-      );
-    }
-
     if (p.maxTradeVolumeQuoted && !this.isNumber(p.maxTradeVolumeQuoted)) {
       this.zErrorFactory.createErrorInfo(
         ['maxTradeVolumeQuoted'],
@@ -244,7 +233,7 @@ export class ZValidations {
       this.zErrorFactory.createErrorInfo(
         ['maxTradeVolumeQuoted'],
         {
-          message: this.messages.minValue(p.risk),
+          message: this.messages.minValue(p.maxTradeVolumeQuoted),
           actual: p.maxTradeVolumeQuoted,
         },
         errors,
