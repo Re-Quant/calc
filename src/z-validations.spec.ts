@@ -382,7 +382,7 @@ describe('ZValidations', () => {
             maxTradeVolumeQuoted: 100,
           };
           expect(zValidationsMock.validate(testData)).to.eql(
-            { leverage: { max: { message: 'Value should be less then 0.', actual: 0 } } },
+            { leverage: { max: { message: 'Value should be less then 1001.', actual: 1001 } } },
           );
         });
       });
