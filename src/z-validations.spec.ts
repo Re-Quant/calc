@@ -302,6 +302,90 @@ describe('ZValidations', () => {
           expect(zValidationsMock.validate(testData)).to.equal(undefined);
         });
       });
+
+      describe('leverage', () => {
+        it(`WHEN: leverage max value less than minimum value
+            THEN: should return validation error`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 0,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { leverage: { max: { message: 'Value should be more then 0.', actual: 0 } } },
+          );
+        });
+
+        it(`WHEN: leverage max value more than maximum value
+            THEN: should passed validation`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 1001,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { leverage: { max: { message: 'Value should be less then 0.', actual: 0 } } },
+          );
+        });
+      });
     });
   });
 });

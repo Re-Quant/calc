@@ -241,7 +241,8 @@ export class ZValidations {
     }
 
     // leverage
-    if (!p.leverage || !p.leverage.allow) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (!p.leverage || !(p.leverage.hasOwnProperty('allow'))) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'allow'],
         {
@@ -251,7 +252,8 @@ export class ZValidations {
       );
     }
 
-    if (p.leverage && p.leverage.allow && !this.isBoolean(p.leverage.allow)) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (p.leverage && !(p.leverage.hasOwnProperty('allow')) && !this.isBoolean(p.leverage.allow)) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'allow'],
         {
@@ -261,7 +263,8 @@ export class ZValidations {
       );
     }
 
-    if (!p.leverage || !p.leverage.max) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (!p.leverage || !(p.leverage.hasOwnProperty('max'))) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'max'],
         {
@@ -271,7 +274,8 @@ export class ZValidations {
       );
     }
 
-    if (p.leverage && p.leverage.max && !this.isNumber(p.leverage.max)) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (p.leverage && p.leverage.hasOwnProperty('max') && !this.isNumber(p.leverage.max)) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'max'],
         {
@@ -282,7 +286,8 @@ export class ZValidations {
     }
 
     if (p.leverage
-      && p.leverage.max
+      && p.leverage.hasOwnProperty('allow') // eslint-disable-line no-prototype-builtins
+      && p.leverage.hasOwnProperty('max')   // eslint-disable-line no-prototype-builtins
       && this.isNumber(p.leverage.max)
       && !this.min(p.leverage.max, 1)
     ) {
@@ -297,7 +302,8 @@ export class ZValidations {
     }
 
     if (p.leverage
-      && p.leverage.max
+      && p.leverage.hasOwnProperty('allow') // eslint-disable-line no-prototype-builtins
+      && p.leverage.hasOwnProperty('max')   // eslint-disable-line no-prototype-builtins
       && this.isNumber(p.leverage.max)
       && !this.max(p.leverage.max, 1000)
     ) {
