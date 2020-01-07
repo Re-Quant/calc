@@ -289,7 +289,7 @@ export class ZValidations {
       && p.leverage.hasOwnProperty('allow') // eslint-disable-line no-prototype-builtins
       && p.leverage.hasOwnProperty('max')   // eslint-disable-line no-prototype-builtins
       && this.isNumber(p.leverage.max)
-      && !this.min(p.leverage.max, 1)
+      && !this.min(p.leverage.max, 0)
     ) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'max'],
@@ -338,8 +338,9 @@ export class ZValidations {
       );
     }
 
-    // breakeven
-    if (!p.breakeven || !p.breakeven.fee) {
+    // breakeven fee
+    // eslint-disable-next-line no-prototype-builtins
+    if (!p.breakeven || !p.breakeven.hasOwnProperty('fee')) {
       this.zErrorFactory.createErrorInfo(
         ['breakeven', 'fee'],
         {
@@ -349,11 +350,44 @@ export class ZValidations {
       );
     }
 
-    if (p.breakeven && p.breakeven.fee && !this.isNumber(p.breakeven.fee)) {
+    if (p.breakeven
+      && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
+      && !this.isNumber(p.breakeven.fee)
+    ) {
       this.zErrorFactory.createErrorInfo(
         ['breakeven', 'fee'],
         {
           message: this.messages.number(),
+        },
+        errors,
+      );
+    }
+
+    if (p.breakeven
+      && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
+      && this.isNumber(p.breakeven.fee)
+      && !this.min(p.breakeven.fee, 0)
+    ) {
+      this.zErrorFactory.createErrorInfo(
+        ['breakeven', 'fee'],
+        {
+          message: this.messages.minValue(p.breakeven.fee),
+          actual: p.breakeven.fee,
+        },
+        errors,
+      );
+    }
+
+    if (p.breakeven
+      && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
+      && this.isNumber(p.breakeven.fee)
+      && !this.max(p.breakeven.fee, 0.1)
+    ) {
+      this.zErrorFactory.createErrorInfo(
+        ['breakeven', 'fee'],
+        {
+          message: this.messages.maxValue(p.breakeven.fee),
+          actual: p.breakeven.fee,
         },
         errors,
       );

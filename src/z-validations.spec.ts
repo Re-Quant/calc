@@ -311,7 +311,7 @@ describe('ZValidations', () => {
             risk: 0.01,
             leverage: {
               allow: true,
-              max: 0,
+              max: -1,
             },
             tradeType: ETradeType.Long,
             breakeven: {
@@ -341,7 +341,7 @@ describe('ZValidations', () => {
             maxTradeVolumeQuoted: 100,
           };
           expect(zValidationsMock.validate(testData)).to.eql(
-            { leverage: { max: { message: 'Value should be more then 0.', actual: 0 } } },
+            { leverage: { max: { message: 'Value should be more then -1.', actual: -1 } } },
           );
         });
 
@@ -383,6 +383,90 @@ describe('ZValidations', () => {
           };
           expect(zValidationsMock.validate(testData)).to.eql(
             { leverage: { max: { message: 'Value should be less then 1001.', actual: 1001 } } },
+          );
+        });
+      });
+
+      describe('fee', () => {
+        it(`WHEN: leverage max value less than minimum value
+            THEN: should return validation error`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: -1,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { breakeven: { fee: { message: 'Value should be more then -1.', actual: -1 } } },
+          );
+        });
+
+        it(`WHEN: leverage max value more than maximum value
+            THEN: should passed validation`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 10,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.2,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { breakeven: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } },
           );
         });
       });
