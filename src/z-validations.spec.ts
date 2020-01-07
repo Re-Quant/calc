@@ -767,6 +767,90 @@ describe('ZValidations', () => {
           { entries: { 0: { fee: { message: 'Should be a number' } } } },
         );
       });
+
+      it(`WHEN: fee value in entries less than minimum value
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: -1,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          {
+            entries: { 0: { fee: { message: 'Value should be more then -1.', actual: -1 } } },
+          },
+        );
+      });
+
+      it(`WHEN: fee value in entries more than maximum value
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.2,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          { entries: { 0: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } } },
+        );
+      });
     });
 
     describe('Stop section', () => {
