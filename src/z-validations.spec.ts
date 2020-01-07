@@ -684,6 +684,89 @@ describe('ZValidations', () => {
           },
         );
       });
+
+      it(`WHEN: absent fee in entry data
+            THEN: should return validation error`, () => {
+        const testData: any = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        expect(<any>zValidationsMock.validate(testData)).to.eql(
+          { entries: { 0: { fee: { message: 'Required field' } } } },
+        );
+      });
+
+      it(`WHEN: value in fee not a number
+            THEN: should return validation error`, () => {
+        const testData: any = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 'test',
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        expect(<any>zValidationsMock.validate(testData)).to.eql(
+          { entries: { 0: { fee: { message: 'Should be a number' } } } },
+        );
+      });
     });
 
     describe('Stop section', () => {
