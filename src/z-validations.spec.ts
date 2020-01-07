@@ -49,6 +49,89 @@ describe('ZValidations', () => {
 
     describe('Common section', () => {
       describe('deposit field', () => {
+        it(`WHEN: absent deposit field
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { deposit: { message: 'Required field' } },
+          );
+        });
+
+        it(`WHEN: deposit value not a number
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 'test',
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { deposit: { message: 'Should be a number' } },
+          );
+        });
+
         it(`WHEN: send data with wrong value in deposit field
             THEN: should return validation error`, () => {
           const testData = {
