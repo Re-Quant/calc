@@ -496,7 +496,7 @@ export class ZValidations {
 
     if (!p.takes) {
       this.zErrorFactory.createErrorInfo(
-        ['stops', 0, 'entity'],
+        ['takes', 0, 'entity'],
         {
           message: this.messages.required(),
         },
