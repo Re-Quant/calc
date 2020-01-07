@@ -419,18 +419,7 @@ export class ZValidations {
     );
 
     // checkSumVolumeParts
-    const sumVolumeParts = p.entries.reduce((acc: number, val) => acc + val.volumePart, 0);
-
-    if (sumVolumeParts > 1) {
-      this.zErrorFactory.createErrorInfo(
-        ['entries', 0, 'entity'],
-        {
-          message: this.messages.sumVolumeParts(),
-          actual: sumVolumeParts,
-        },
-        errors,
-      );
-    }
+    this.validateSumVolumeParts('entries', p.entries, errors);
 
     return Object.entries(errors).length === 0 && errors.constructor === Object
       ? undefined
@@ -494,6 +483,9 @@ export class ZValidations {
       }
     }
 
+    // checkSumVolumeParts
+    this.validateSumVolumeParts('stops', p.stops, errors);
+
     return Object.entries(errors).length === 0 && errors.constructor === Object
       ? undefined
       : errors;
@@ -556,6 +548,9 @@ export class ZValidations {
         });
       }
     }
+
+    // checkSumVolumeParts
+    this.validateSumVolumeParts('takes', p.takes, errors);
 
     return Object.entries(errors).length === 0 && errors.constructor === Object
       ? undefined
@@ -712,6 +707,21 @@ export class ZValidations {
         {
           message: this.messages.maxValue(item.fee),
           actual: item.fee,
+        },
+        errors,
+      );
+    }
+  }
+
+  private validateSumVolumeParts(entityName: any, entity: TradeOrderArg[], errors: ValidationTradeErrors): void {
+    const sumVolumeParts = entity.reduce((acc: number, val) => acc + val.volumePart, 0);
+
+    if (sumVolumeParts > 1) {
+      this.zErrorFactory.createErrorInfo(
+        [entityName, 0, 'entity'],
+        {
+          message: this.messages.sumVolumeParts(),
+          actual: sumVolumeParts,
         },
         errors,
       );
