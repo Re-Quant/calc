@@ -138,6 +138,14 @@ export class ZValidations {
     return value <= maxValue;
   }
 
+  public getMinPrice(data: TradeOrderArg[]): number {
+    return data.reduce((min, b) => Math.min(min, b.price), data[0].price);
+  }
+
+  public getMaxPrice(data: TradeOrderArg[]): number {
+    return data.reduce((max, b) => Math.max(max, b.price), data[0].price);
+  }
+
   public validateCommonFields(p: TradeInfoArgs): ValidationTradeErrors | undefined {
     const errors: ValidationTradeErrors = {} as any;
     // deposit
@@ -447,38 +455,38 @@ export class ZValidations {
 
     if (p.tradeType === ETradeType.Long) {
       if (p.entries) {
+        const minPrice: number = this.getMinPrice(p.entries);
+
         p.stops.forEach((item: TradeOrderArg, i: number) => {
-          p.entries.forEach((itemEntry) => {
-            if (item.price >= itemEntry.price) {
-              this.zErrorFactory.createErrorInfo(
-                ['stops', i, 'price'],
-                {
-                  message: this.messages.lessPrice(item.price, itemEntry.price),
-                  actual: item.price,
-                },
-                errors,
-              );
-            }
-          });
+          if (item.price >= minPrice) {
+            this.zErrorFactory.createErrorInfo(
+              ['stops', i, 'price'],
+              {
+                message: this.messages.lessPrice(item.price, minPrice),
+                actual: item.price,
+              },
+              errors,
+            );
+          }
         });
       }
     }
 
     if (p.tradeType === ETradeType.Short) {
       if (p.entries) {
+        const maxPrice: number = this.getMaxPrice(p.entries);
+
         p.stops.forEach((item: TradeOrderArg, i: number) => {
-          p.entries.forEach((itemEntry) => {
-            if (item.price < itemEntry.price) {
-              this.zErrorFactory.createErrorInfo(
-                ['stops', i, 'price'],
-                {
-                  message: this.messages.biggerPrice(item.price, itemEntry.price),
-                  actual: item.price,
-                },
-                errors,
-              );
-            }
-          });
+          if (item.price <= maxPrice) {
+            this.zErrorFactory.createErrorInfo(
+              ['stops', i, 'price'],
+              {
+                message: this.messages.biggerPrice(item.price, maxPrice),
+                actual: item.price,
+              },
+              errors,
+            );
+          }
         });
       }
     }
@@ -510,41 +518,40 @@ export class ZValidations {
       (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('takes', item, i, errors),
     );
 
-    // TODO: special validation
     if (p.tradeType === ETradeType.Long) {
       if (p.entries) {
+        const minPrice: number = this.getMinPrice(p.entries);
+
         p.takes.forEach((item: TradeOrderArg, i: number) => {
-          p.entries.forEach((itemEntry) => {
-            if (item.price < itemEntry.price) {
-              this.zErrorFactory.createErrorInfo(
-                ['takes', i, 'price'],
-                {
-                  message: this.messages.biggerPrice(item.price, itemEntry.price),
-                  actual: item.price,
-                },
-                errors,
-              );
-            }
-          });
+          if (item.price <= minPrice) {
+            this.zErrorFactory.createErrorInfo(
+              ['takes', i, 'price'],
+              {
+                message: this.messages.biggerPrice(item.price, minPrice),
+                actual: item.price,
+              },
+              errors,
+            );
+          }
         });
       }
     }
 
     if (p.tradeType === ETradeType.Short) {
       if (p.entries) {
+        const maxPrice: number = this.getMaxPrice(p.entries);
+
         p.takes.forEach((item: TradeOrderArg, i: number) => {
-          p.entries.forEach((itemEntry) => {
-            if (item.price > itemEntry.price) {
-              this.zErrorFactory.createErrorInfo(
-                ['takes', i, 'price'],
-                {
-                  message: this.messages.lessPrice(item.price, itemEntry.price),
-                  actual: item.price,
-                },
-                errors,
-              );
-            }
-          });
+          if (item.price >= maxPrice) {
+            this.zErrorFactory.createErrorInfo(
+              ['takes', i, 'price'],
+              {
+                message: this.messages.lessPrice(item.price, maxPrice),
+                actual: item.price,
+              },
+              errors,
+            );
+          }
         });
       }
     }

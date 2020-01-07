@@ -1362,6 +1362,110 @@ describe('ZValidations', () => {
           { stops: { 0: { entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 2 } } } },
         );
       });
+
+      it(`WHEN: tradeType === 'long' and stops price bigger then entries price
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 1000,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long, // <--
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+            {
+              price: 110,
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 110, // <--
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+            {
+              price: 100,
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 5000,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql({ stops: {
+          0: { price: { message: 'Price 110 should be less then 100.', actual: 110 } },
+          1: { price: { message: 'Price 100 should be less then 100.', actual: 100 } },
+        } });
+      });
+
+      it(`WHEN: tradeType === 'short' and stops price less then entries price
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 1000,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Short, // <--
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+            {
+              price: 110,
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 110, // <--
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+            {
+              price: 100,
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 5000,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql({ stops: {
+          0: { price: { message: 'Price 110 should be more then 110.', actual: 110 } },
+          1: { price: { message: 'Price 100 should be more then 110.', actual: 100 } },
+        } });
+      });
     });
 
     describe('Take section', () => {
@@ -1743,6 +1847,119 @@ describe('ZValidations', () => {
         expect(zValidationsMock.validate(testData)).to.eql(
           { takes: { 0: { entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 2 } } } },
         );
+      });
+
+      it(`WHEN: tradeType === 'long' and takes price less then entries price
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 1000,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long, // <--
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+            {
+              price: 110,
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+            {
+              price: 80,
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 110, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+            {
+              price: 100, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 5000,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql({ takes: {
+          // 0: { price: { message: 'Price 110 should be less then 100.', actual: 110 } },  // TODO: need to discuss
+          1: { price: { message: 'Price 100 should be more then 100.', actual: 100 } },
+        } });
+      });
+
+      it(`WHEN: tradeType === 'short' and takes price less then entries price
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 1000,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Short, // <--
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+            {
+              price: 110,
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 120,
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+            {
+              price: 130,
+              volumePart: 0.5,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 110, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+            {
+              price: 100, // <--
+              volumePart: 0.5,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 5000,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql({ takes: {
+          0: { price: { message: 'Price 110 should be less then 110.', actual: 110 } },
+        } });
       });
     });
   });
