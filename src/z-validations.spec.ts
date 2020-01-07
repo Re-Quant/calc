@@ -346,7 +346,7 @@ describe('ZValidations', () => {
         });
 
         it(`WHEN: leverage max value more than maximum value
-            THEN: should passed validation`, () => {
+            THEN: should return validation error`, () => {
           const testData = {
             deposit: 100,
             risk: 0.01,
@@ -388,7 +388,7 @@ describe('ZValidations', () => {
       });
 
       describe('fee', () => {
-        it(`WHEN: leverage max value less than minimum value
+        it(`WHEN: fee value less than minimum value
             THEN: should return validation error`, () => {
           const testData = {
             deposit: 100,
@@ -429,8 +429,8 @@ describe('ZValidations', () => {
           );
         });
 
-        it(`WHEN: leverage max value more than maximum value
-            THEN: should passed validation`, () => {
+        it(`WHEN: fee value more than maximum value
+            THEN: should return validation error`, () => {
           const testData = {
             deposit: 100,
             risk: 0.01,
