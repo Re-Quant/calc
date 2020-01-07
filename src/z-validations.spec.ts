@@ -650,7 +650,7 @@ describe('ZValidations', () => {
           },
           entries: [
             {
-              price: -1,
+              price: -1, // <--
               volumePart: 1,
               fee: 0.002,
             },
@@ -695,7 +695,7 @@ describe('ZValidations', () => {
           entries: [
             {
               price: 100,
-              volumePart: -1,
+              volumePart: -1, // <--
               fee: 0.002,
             },
           ],
@@ -736,7 +736,7 @@ describe('ZValidations', () => {
           entries: [
             {
               price: 100,
-              volumePart: 1.2,
+              volumePart: 1.2, // <--
               fee: 0.002,
             },
           ],
@@ -782,7 +782,7 @@ describe('ZValidations', () => {
             fee: 0.001,
           },
           entries: [
-            {
+            {                // <--
               price: 100,
               volumePart: 1,
             },
@@ -826,7 +826,7 @@ describe('ZValidations', () => {
             {
               price: 100,
               volumePart: 1,
-              fee: 'test',
+              fee: 'test', // <--
             },
           ],
           stops: [
@@ -868,7 +868,7 @@ describe('ZValidations', () => {
             {
               price: 100,
               volumePart: 1,
-              fee: -1,
+              fee: -1, // <--
             },
           ],
           stops: [
@@ -911,7 +911,7 @@ describe('ZValidations', () => {
             {
               price: 100,
               volumePart: 1,
-              fee: 0.2,
+              fee: 0.2, // <--
             },
           ],
           stops: [
@@ -951,12 +951,12 @@ describe('ZValidations', () => {
           entries: [
             {
               price: 100,
-              volumePart: 1,
+              volumePart: 1, // <--
               fee: 0.002,
             },
             {
               price: 100,
-              volumePart: 1,
+              volumePart: 1, // <--
               fee: 0.002,
             },
           ],
@@ -983,7 +983,386 @@ describe('ZValidations', () => {
     });
 
     describe('Stop section', () => {
+      it(`WHEN: stop data absent
+            THEN: should return validation error`, () => {
+        const testData: any = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        expect(<any>zValidationsMock.validate(testData)).to.eql(
+          { stops: { 0: { entity: { message: 'Required field' } } } },
+        );
+      });
 
+      it(`WHEN: send order with wrong min price
+            THEN: should run validate min price for entries and price comparing stop price with the current price`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 10,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: -1, // <--
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          {
+            entries: { 0: { price: { message: 'Value should be more then -1.', actual: -1 } } },
+            stops: { 0: { price: { message: 'Price 90 should be less then -1.', actual: 90 } } },
+          },
+        );
+      });
+
+      it(`WHEN: volumePart value less than minimum value
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: -1, // <--
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          { stops: { 0: { volumePart: { message: 'Value should be more then -1.', actual: -1 } } } },
+        );
+      });
+
+      it(`WHEN: volumePart value more than maximum value
+            THEN: should run validate max volumePart and sum of volume parts`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1.2, // <--
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          {
+            stops: {
+              0: {
+                entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 1.2 },
+                volumePart: { message: 'Value should be less then 1.2.', actual: 1.2 },
+              },
+            },
+          },
+        );
+      });
+
+      it(`WHEN: absent fee in entry data
+            THEN: should return validation error`, () => {
+        const testData: any = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          stops: [
+            {                // <--
+              price: 90,
+              volumePart: 1,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        expect(<any>zValidationsMock.validate(testData)).to.eql(
+          { stops: { 0: { fee: { message: 'Required field' } } } },
+        );
+      });
+
+      it(`WHEN: value in fee not a number
+            THEN: should return validation error`, () => {
+        const testData: any = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 'test', // <--
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        expect(<any>zValidationsMock.validate(testData)).to.eql(
+          { stops: { 0: { fee: { message: 'Should be a number' } } } },
+        );
+      });
+
+      it(`WHEN: fee value in entries less than minimum value
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: -1, // <--
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          {
+            stops: { 0: { fee: { message: 'Value should be more then -1.', actual: -1 } } },
+          },
+        );
+      });
+
+      it(`WHEN: fee value in entries more than maximum value
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 100,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.2, // <--
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 100,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          { stops: { 0: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } } },
+        );
+      });
+
+      it(`WHEN: sum of volumePart more then 1
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 1000,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1, // <--
+              fee: 0.001,
+            },
+            {
+              price: 90,
+              volumePart: 1, // <--
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 5000,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          { stops: { 0: { entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 2 } } } },
+        );
+      });
     });
 
     describe('Take section', () => {
