@@ -387,6 +387,50 @@ describe('ZValidations', () => {
         });
       });
 
+      describe('tradeType', () => {
+        it(`WHEN: send wrong tradeType
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 1,
+            },
+            tradeType: 'test',
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { tradeType: { message: 'Wrong trade type', actual: 'test' } },
+          );
+        });
+      });
+
       describe('fee', () => {
         it(`WHEN: fee value less than minimum value
             THEN: should return validation error`, () => {

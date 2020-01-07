@@ -7,7 +7,7 @@ import {
 
 export interface ErrorInfo {
   message: string;
-  actual?: number;
+  actual?: number | string;
 }
 
 export type OrderError = {
@@ -333,6 +333,7 @@ export class ZValidations {
         ['tradeType'],
         {
           message: this.messages.wrongTradeType(),
+          actual: p.tradeType,
         },
         errors,
       );
