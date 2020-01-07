@@ -760,7 +760,7 @@ describe('ZValidations', () => {
           {
             entries: {
               0: {
-                entity: { message: 'Sum of volume parts should be equal \'1\'', actual: 1.2 },
+                entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 1.2 },
                 volumePart: { message: 'Value should be less then 1.2.', actual: 1.2 },
               },
             },
@@ -932,6 +932,52 @@ describe('ZValidations', () => {
         };
         expect(zValidationsMock.validate(testData)).to.eql(
           { entries: { 0: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } } },
+        );
+      });
+
+      it(`WHEN: sum of volumePart more then 1
+            THEN: should return validation error`, () => {
+        const testData = {
+          deposit: 1000,
+          risk: 0.01,
+          leverage: {
+            allow: true,
+            max: 5,
+          },
+          tradeType: ETradeType.Long,
+          breakeven: {
+            fee: 0.001,
+          },
+          entries: [
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+            {
+              price: 100,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          stops: [
+            {
+              price: 90,
+              volumePart: 1,
+              fee: 0.001,
+            },
+          ],
+          takes: [
+            {
+              price: 150,
+              volumePart: 1,
+              fee: 0.002,
+            },
+          ],
+          maxTradeVolumeQuoted: 5000,
+        };
+        expect(zValidationsMock.validate(testData)).to.eql(
+          { entries: { 0: { entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 2 } } } },
         );
       });
     });

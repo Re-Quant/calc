@@ -85,7 +85,7 @@ export class ZValidations {
     number: (): string => 'Should be a number',
     string: (): string => 'Should be a string',
     boolean: (): string => 'Should be a boolean',
-    sumVolumeParts: (): string => 'Sum of volume parts should be equal \'1\'',
+    sumVolumeParts: (): string => 'Sum of volume parts should be no more than \'1\'',
     minValue: (actual: number): string => `Value should be more then ${ actual }.`,
     maxValue: (actual: number): string => `Value should be less then ${ actual }.`,
     lessPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be less then ${ comperingPrice }.`,
