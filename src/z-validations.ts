@@ -81,11 +81,11 @@ class ZValidationErrorFactory {
 // tslint:disable-next-line:max-classes-per-file
 export class ZValidations {
   public messages = {
-    required: (): string => 'required field',
-    number: (): string => 'should be a number',
-    string: (): string => 'should be a string',
-    boolean: (): string => 'should be a boolean',
-    sumVolumeParts: (): string => 'should be equal \'1\'',
+    required: (): string => 'Required field',
+    number: (): string => 'Should be a number',
+    string: (): string => 'Should be a string',
+    boolean: (): string => 'Should be a boolean',
+    sumVolumeParts: (): string => 'Sum of volume parts should be equal \'1\'',
     minValue: (actual: number): string => `Value should be more then ${ actual }.`,
     maxValue: (actual: number): string => `Value should be less then ${ actual }.`,
     lessPrice: (actual: number, comperingPrice: number): string => `Price ${ actual } should be less then ${ comperingPrice }.`,
@@ -415,19 +415,10 @@ export class ZValidations {
     }
 
     p.entries.forEach(
-      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('entries', item, i),
+      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('entries', item, i, errors),
     );
 
     // checkSumVolumeParts
-    if (!p.entries) {
-      this.zErrorFactory.createErrorInfo(
-        ['entries', 0, 'entity'],
-        {
-          message: this.messages.required(),
-        },
-        errors,
-      );
-    }
 
     // TODO: why equal '1'
     // Need to use eq
@@ -438,6 +429,7 @@ export class ZValidations {
         ['entries', 0, 'entity'],
         {
           message: this.messages.sumVolumeParts(),
+          actual: sumVolumeParts,
         },
         errors,
       );
@@ -464,7 +456,7 @@ export class ZValidations {
     }
 
     p.stops.forEach(
-      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('stops', item, i),
+      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('stops', item, i, errors),
     );
 
     // TODO: special validation
@@ -527,7 +519,7 @@ export class ZValidations {
     }
 
     p.takes.forEach(
-      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('takes', item, i),
+      (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('takes', item, i, errors),
     );
 
     // TODO: special validation
@@ -590,10 +582,12 @@ export class ZValidations {
   }
 
   // TODO: need to set up type for entityName
-  // need to create type = '' | '' | ''
-  private validateOrderBaseScenario(entityName: any, item: TradeOrderArg, i: number): void {
-    const errors: ValidationTradeErrors = {} as any;
-
+  private validateOrderBaseScenario(
+    entityName: any,
+    item: TradeOrderArg,
+    i: number,
+    errors: ValidationTradeErrors,
+  ): void {
     // price
     if (!item.price) {
       this.zErrorFactory.createErrorInfo(
@@ -628,8 +622,6 @@ export class ZValidations {
         errors,
       );
     }
-
-    // TODO: max price ???
 
     // volumePart
     if (!item.volumePart) {
@@ -717,7 +709,7 @@ export class ZValidations {
 
     if (item.fee
       && this.isNumber(item.fee)
-      && !this.max(item.fee, 1)
+      && !this.max(item.fee, 0.1)
     ) {
       this.zErrorFactory.createErrorInfo(
         [entityName, i, 'fee'],
