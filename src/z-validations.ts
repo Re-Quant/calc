@@ -456,7 +456,6 @@ export class ZValidations {
       (item: TradeOrderArg, i: number) => this.validateOrderBaseScenario('stops', item, i, errors),
     );
 
-    // TODO: special validation
     if (p.tradeType === ETradeType.Long) {
       if (p.entries) {
         p.stops.forEach((item: TradeOrderArg, i: number) => {
