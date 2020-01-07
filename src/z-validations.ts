@@ -419,9 +419,6 @@ export class ZValidations {
     );
 
     // checkSumVolumeParts
-
-    // TODO: why equal '1'
-    // Need to use eq
     const sumVolumeParts = p.entries.reduce((acc: number, val) => acc + val.volumePart, 0);
 
     if (sumVolumeParts > 1) {
