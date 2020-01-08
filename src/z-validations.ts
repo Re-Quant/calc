@@ -520,14 +520,14 @@ export class ZValidations {
 
     if (p.tradeType === ETradeType.Long) {
       if (p.entries) {
-        const minPrice: number = this.getMinPrice(p.entries);
+        const maxPrice: number = this.getMaxPrice(p.entries);
 
         p.takes.forEach((item: TradeOrderArg, i: number) => {
-          if (item.price <= minPrice) {
+          if (item.price <= maxPrice) {
             this.zErrorFactory.createErrorInfo(
               ['takes', i, 'price'],
               {
-                message: this.messages.biggerPrice(item.price, minPrice),
+                message: this.messages.biggerPrice(item.price, maxPrice),
                 actual: item.price,
               },
               errors,
@@ -539,14 +539,14 @@ export class ZValidations {
 
     if (p.tradeType === ETradeType.Short) {
       if (p.entries) {
-        const maxPrice: number = this.getMaxPrice(p.entries);
+        const minPrice: number = this.getMinPrice(p.entries);
 
         p.takes.forEach((item: TradeOrderArg, i: number) => {
-          if (item.price >= maxPrice) {
+          if (item.price >= minPrice) {
             this.zErrorFactory.createErrorInfo(
               ['takes', i, 'price'],
               {
-                message: this.messages.lessPrice(item.price, maxPrice),
+                message: this.messages.lessPrice(item.price, minPrice),
                 actual: item.price,
               },
               errors,

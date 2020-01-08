@@ -1454,7 +1454,7 @@ describe('ZValidations', () => {
           ],
           takes: [
             {
-              price: 100,
+              price: 90,
               volumePart: 1,
               fee: 0.002,
             },
@@ -1901,8 +1901,8 @@ describe('ZValidations', () => {
           maxTradeVolumeQuoted: 5000,
         };
         expect(zValidationsMock.validate(testData)).to.eql({ takes: {
-          // 0: { price: { message: 'Price 110 should be less then 100.', actual: 110 } },  // TODO: need to discuss
-          1: { price: { message: 'Price 100 should be more then 100.', actual: 100 } },
+          0: { price: { message: 'Price 110 should be more then 110.', actual: 110 } },
+          1: { price: { message: 'Price 100 should be more then 110.', actual: 100 } },
         } });
       });
 
@@ -1958,7 +1958,8 @@ describe('ZValidations', () => {
           maxTradeVolumeQuoted: 5000,
         };
         expect(zValidationsMock.validate(testData)).to.eql({ takes: {
-          0: { price: { message: 'Price 110 should be less then 110.', actual: 110 } },
+          0: { price: { message: 'Price 110 should be less then 100.', actual: 110 } },
+          1: { price: { message: 'Price 100 should be less then 100.', actual: 100 } },
         } });
       });
     });
