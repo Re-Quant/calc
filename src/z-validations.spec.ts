@@ -265,7 +265,7 @@ describe('ZValidations', () => {
             THEN: should return validation error`, () => {
           const testData = {
             deposit: 100,
-            risk: 0.2,
+            risk: 2,
             leverage: {
               allow: true,
               max: 5,
@@ -299,7 +299,7 @@ describe('ZValidations', () => {
           };
 
           expect(zValidationsMock.validate(testData)).to.eql(
-            { risk: { message: 'Value should be less then 0.2.', actual: 0.2 } },
+            { risk: { message: 'Value should be less then 2.', actual: 2 } },
           );
         });
       });
@@ -567,7 +567,7 @@ describe('ZValidations', () => {
             },
             tradeType: ETradeType.Long,
             breakeven: {
-              fee: 0.2,
+              fee: 2,
             },
             entries: [
               {
@@ -593,7 +593,7 @@ describe('ZValidations', () => {
             maxTradeVolumeQuoted: 100,
           };
           expect(zValidationsMock.validate(testData)).to.eql(
-            { breakeven: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } },
+            { breakeven: { fee: { message: 'Value should be less then 2.', actual: 2 } } },
           );
         });
       });
@@ -911,7 +911,7 @@ describe('ZValidations', () => {
             {
               price: 100,
               volumePart: 1,
-              fee: 0.2, // <--
+              fee: 2, // <--
             },
           ],
           stops: [
@@ -931,7 +931,7 @@ describe('ZValidations', () => {
           maxTradeVolumeQuoted: 100,
         };
         expect(zValidationsMock.validate(testData)).to.eql(
-          { entries: { 0: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } } },
+          { entries: { 0: { fee: { message: 'Value should be less then 2.', actual: 2 } } } },
         );
       });
 
@@ -1300,7 +1300,7 @@ describe('ZValidations', () => {
             {
               price: 90,
               volumePart: 1,
-              fee: 0.2, // <--
+              fee: 2, // <--
             },
           ],
           takes: [
@@ -1313,7 +1313,7 @@ describe('ZValidations', () => {
           maxTradeVolumeQuoted: 100,
         };
         expect(zValidationsMock.validate(testData)).to.eql(
-          { stops: { 0: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } } },
+          { stops: { 0: { fee: { message: 'Value should be less then 2.', actual: 2 } } } },
         );
       });
 
@@ -1793,13 +1793,13 @@ describe('ZValidations', () => {
             {
               price: 150,
               volumePart: 1,
-              fee: 0.2, // <--
+              fee: 2, // <--
             },
           ],
           maxTradeVolumeQuoted: 100,
         };
         expect(zValidationsMock.validate(testData)).to.eql(
-          { takes: { 0: { fee: { message: 'Value should be less then 0.2.', actual: 0.2 } } } },
+          { takes: { 0: { fee: { message: 'Value should be less then 2.', actual: 2 } } } },
         );
       });
 

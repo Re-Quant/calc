@@ -212,7 +212,7 @@ export class ZValidations {
       );
     }
 
-    if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 0.1)) {
+    if (p.risk && this.isNumber(p.risk) && !this.max(p.risk, 1)) {
       this.zErrorFactory.createErrorInfo(
         ['risk'],
         {
@@ -390,7 +390,7 @@ export class ZValidations {
     if (p.breakeven
       && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
       && this.isNumber(p.breakeven.fee)
-      && !this.max(p.breakeven.fee, 0.1)
+      && !this.max(p.breakeven.fee, 1)
     ) {
       this.zErrorFactory.createErrorInfo(
         ['breakeven', 'fee'],
@@ -707,7 +707,7 @@ export class ZValidations {
 
     if (item.fee
       && this.isNumber(item.fee)
-      && !this.max(item.fee, 0.1)
+      && !this.max(item.fee, 1)
     ) {
       this.zErrorFactory.createErrorInfo(
         [entityName, i, 'fee'],
