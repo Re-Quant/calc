@@ -4,10 +4,6 @@ import { ETradeType } from './models';
 describe('ZValidations', () => {
   const zValidationsMock: ZValidations = zValidations;
 
-  beforeEach(() => {
-    // zValidationsMock = zValidations;
-  });
-
   describe('validate', () => {
     it('should pass validation', () => {
       const testData = {
