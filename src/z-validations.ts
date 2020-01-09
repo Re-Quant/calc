@@ -159,7 +159,7 @@ export class ZValidations {
       );
     }
 
-    if (p.deposit && !this.isNumber(p.deposit)) {
+    if (p.deposit && this.isDefined(p.deposit) && !this.isNumber(p.deposit)) {
       this.zErrorFactory.createErrorInfo(
         ['deposit'],
         {
@@ -191,7 +191,7 @@ export class ZValidations {
       );
     }
 
-    if (p.risk && !this.isNumber(p.risk)) {
+    if (p.risk && this.isDefined(p.risk) && !this.isNumber(p.risk)) {
       this.zErrorFactory.createErrorInfo(
         ['risk'],
         {

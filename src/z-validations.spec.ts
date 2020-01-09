@@ -219,6 +219,89 @@ describe('ZValidations', () => {
           });
         });
 
+        it(`WHEN: absent risk field
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 100,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { risk: { message: 'Required field' } },
+          );
+        });
+
+        it(`WHEN: risk value not a number
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 'test',
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { risk: { message: 'Should be a number' } },
+          );
+        });
+
         it(`WHEN: send less than minimum value
             THEN: should return validation error`, () => {
           const testData = {
@@ -305,7 +388,49 @@ describe('ZValidations', () => {
       });
 
       describe('maxTradeVolumeQuoted', () => {
-        it(`WHEN: send data with wrong value in deposit field
+        it(`WHEN: maxTradeVolumeQuoted value not a number
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 'test',
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { maxTradeVolumeQuoted: { message: 'Should be a number' } },
+          );
+        });
+
+        it(`WHEN: send less than minimum value
             THEN: should return validation error`, () => {
           const testData = {
             deposit: 100,
@@ -468,9 +593,92 @@ describe('ZValidations', () => {
             { leverage: { max: { message: 'Value should be less then 1001.', actual: 1001 } } },
           );
         });
+
+        it(`WHEN: leverage value not a number
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 'test',
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { leverage: { max: { message: 'Should be a number' } } },
+          );
+        });
       });
 
       describe('tradeType', () => {
+        it(`WHEN: absent tradeType field
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { tradeType: { message: 'Required field' } },
+          );
+        });
+
         it(`WHEN: send wrong tradeType
             THEN: should return validation error`, () => {
           const testData: any = {
@@ -515,6 +723,89 @@ describe('ZValidations', () => {
       });
 
       describe('fee', () => {
+        it(`WHEN: absent deposit field
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { breakeven: { fee: { message: 'Required field' } } },
+          );
+        });
+
+        it(`WHEN: fee value not a number
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 'test',
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { breakeven: { fee: { message: 'Should be a number' } } },
+          );
+        });
+
         it(`WHEN: fee value less than minimum value
             THEN: should return validation error`, () => {
           const testData = {
