@@ -95,7 +95,7 @@ export class ZValidations {
 
   public zErrorFactory: ZValidationErrorFactory;
 
-  constructor() {
+  public constructor() {
     this.zErrorFactory = new ZValidationErrorFactory();
   }
 
