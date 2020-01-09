@@ -1523,7 +1523,7 @@ describe('ZValidations', () => {
           });
         });
 
-        it(`WHEN: entries price value not a number
+        it(`WHEN: stop price value not a number
             THEN: should return validation error`, () => {
           const testData: any = {
             deposit: 1000,
@@ -1561,7 +1561,7 @@ describe('ZValidations', () => {
           };
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           expect(<any>zValidationsMock.validate(testData)).to.eql({
-            entries: { 0: { stops: { message: 'Should be a number' } } },
+            stops: { 0: { price: { message: 'Should be a number' } } },
           });
         });
 
