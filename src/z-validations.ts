@@ -249,8 +249,7 @@ export class ZValidations {
     }
 
     // leverage
-    // eslint-disable-next-line no-prototype-builtins
-    if (!p.leverage || !(p.leverage.hasOwnProperty('allow'))) {
+    if (!p.leverage || !this.isDefined(p.leverage.allow)) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'allow'],
         {
@@ -260,8 +259,7 @@ export class ZValidations {
       );
     }
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (p.leverage && !(p.leverage.hasOwnProperty('allow')) && !this.isBoolean(p.leverage.allow)) {
+    if (p.leverage && this.isDefined(p.leverage.allow) && !this.isBoolean(p.leverage.allow)) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'allow'],
         {
@@ -271,8 +269,7 @@ export class ZValidations {
       );
     }
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (!p.leverage || !(p.leverage.hasOwnProperty('max'))) {
+    if (!p.leverage || !this.isDefined(p.leverage.max)) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'max'],
         {
@@ -282,8 +279,7 @@ export class ZValidations {
       );
     }
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (p.leverage && p.leverage.hasOwnProperty('max') && !this.isNumber(p.leverage.max)) {
+    if (p.leverage && this.isDefined(p.leverage.max) && !this.isNumber(p.leverage.max)) {
       this.zErrorFactory.createErrorInfo(
         ['leverage', 'max'],
         {
@@ -310,8 +306,8 @@ export class ZValidations {
     }
 
     if (p.leverage
-      && p.leverage.hasOwnProperty('allow') // eslint-disable-line no-prototype-builtins
-      && p.leverage.hasOwnProperty('max')   // eslint-disable-line no-prototype-builtins
+      && this.isDefined(p.leverage.allow)
+      && this.isDefined(p.leverage.max)
       && this.isNumber(p.leverage.max)
       && !this.max(p.leverage.max, 1000)
     ) {
@@ -349,7 +345,7 @@ export class ZValidations {
 
     // breakeven fee
     // eslint-disable-next-line no-prototype-builtins
-    if (!p.breakeven || !p.breakeven.hasOwnProperty('fee')) {
+    if (!p.breakeven || !this.isDefined(p.breakeven.fee)) {
       this.zErrorFactory.createErrorInfo(
         ['breakeven', 'fee'],
         {
@@ -360,7 +356,7 @@ export class ZValidations {
     }
 
     if (p.breakeven
-      && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
+      && this.isDefined(p.breakeven.fee)
       && !this.isNumber(p.breakeven.fee)
     ) {
       this.zErrorFactory.createErrorInfo(
@@ -373,7 +369,7 @@ export class ZValidations {
     }
 
     if (p.breakeven
-      && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
+      && this.isDefined(p.breakeven.fee)
       && this.isNumber(p.breakeven.fee)
       && !this.min(p.breakeven.fee, 0)
     ) {
@@ -388,7 +384,7 @@ export class ZValidations {
     }
 
     if (p.breakeven
-      && p.breakeven.hasOwnProperty('fee') // eslint-disable-line no-prototype-builtins
+      && this.isDefined(p.breakeven.fee)
       && this.isNumber(p.breakeven.fee)
       && !this.max(p.breakeven.fee, 1)
     ) {
