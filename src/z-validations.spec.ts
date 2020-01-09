@@ -2139,349 +2139,521 @@ describe('ZValidations', () => {
         );
       });
 
-      it(`WHEN: send order with wrong min price
+      describe('price', () => {
+        it(`WHEN: absent price field
             THEN: should return validation error`, () => {
-        const testData = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 10,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
-              fee: 0.002,
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
             },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          takes: [
-            {
-              price: -1, // <--
-              volumePart: 1,
-              fee: 0.002,
-            },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        expect(zValidationsMock.validate(testData)).to.eql(
-          {
-            takes: { 0: { price: { message: 'Price -1 should be more then 100.', actual: -1 } } },
-          },
-        );
-      });
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql({
+            takes: { 0: { price: { message: 'Required field' } } },
+          });
+        });
 
-      it(`WHEN: volumePart value less than minimum value
+        it(`WHEN: take price value not a number
             THEN: should return validation error`, () => {
-        const testData = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
-              fee: 0.002,
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
             },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          takes: [
-            {
-              price: 150,
-              volumePart: -1, // <--
-              fee: 0.002,
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 'test',
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql({
+            takes: { 0: { price: { message: 'Should be a number' } } },
+          });
+        });
+
+        it(`WHEN: send order with wrong min price
+            THEN: should return validation error`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 10,
             },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        expect(zValidationsMock.validate(testData)).to.eql(
-          { takes: { 0: { volumePart: { message: 'Value should be more then -1.', actual: -1 } } } },
-        );
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: -1, // <--
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            {
+              takes: { 0: { price: { message: 'Price -1 should be more then 100.', actual: -1 } } },
+            },
+          );
+        });
       });
 
-      it(`WHEN: volumePart value more than maximum value
+      describe('volumePart', () => {
+        it(`WHEN: absent volumePart field
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql({
+            takes: { 0: { volumePart: { message: 'Required field' } } },
+          });
+        });
+
+        it(`WHEN: entries volumePart value not a number
+            THEN: should return validation error`, () => {
+          const testData: any = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 'test', // <--
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql({
+            takes: { 0: { volumePart: { message: 'Should be a number' } } },
+          });
+        });
+
+        it(`WHEN: volumePart value less than minimum value
+            THEN: should return validation error`, () => {
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: -1, // <--
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { takes: { 0: { volumePart: { message: 'Value should be more then -1.', actual: -1 } } } },
+          );
+        });
+
+        it(`WHEN: volumePart value more than maximum value
             THEN: should run validate max volumePart and sum of volume parts`, () => {
-        const testData = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
-              fee: 0.002,
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
             },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          takes: [
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1.2, // <--
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
             {
-              price: 150,
-              volumePart: 1.2, // <--
-              fee: 0.002,
-            },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        expect(zValidationsMock.validate(testData)).to.eql(
-          {
-            takes: {
-              0: {
-                entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 1.2 },
-                volumePart: { message: 'Value should be less then 1.2.', actual: 1.2 },
+              takes: {
+                0: {
+                  entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 1.2 },
+                  volumePart: { message: 'Value should be less then 1.2.', actual: 1.2 },
+                },
               },
             },
-          },
-        );
+          );
+        });
+
+        it(`WHEN: sum of volumePart more then 1
+            THEN: should return validation error`, () => {
+          const testData = {
+            deposit: 1000,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
+              fee: 0.001,
+            },
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1, // <--
+                fee: 0.002,
+              },
+              {
+                price: 150,
+                volumePart: 1, // <--
+                fee: 0.002,
+              },
+            ],
+            maxTradeVolumeQuoted: 5000,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { takes: { 0: { entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 2 } } } },
+          );
+        });
       });
 
-      it(`WHEN: absent fee in takes data
+      describe('fee', () => {
+        it(`WHEN: absent fee in takes data
             THEN: should return validation error`, () => {
-        const testData: any = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
+          const testData: any = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
-              fee: 0.001,
-            },
-          ],
-          takes: [
-            {                // <--
-              price: 150,
-              volumePart: 1,
-            },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        expect(<any>zValidationsMock.validate(testData)).to.eql(
-          { takes: { 0: { fee: { message: 'Required field' } } } },
-        );
-      });
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            takes: [
+              {                // <--
+                price: 150,
+                volumePart: 1,
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { takes: { 0: { fee: { message: 'Required field' } } } },
+          );
+        });
 
-      it(`WHEN: value in fee not a number
+        it(`WHEN: value in fee not a number
             THEN: should return validation error`, () => {
-        const testData: any = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
+          const testData: any = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
-              fee: 0.002,
-            },
-          ],
-          takes: [
-            {
-              price: 150,
-              volumePart: 1,
-              fee: 'test', // <--
-            },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        expect(<any>zValidationsMock.validate(testData)).to.eql(
-          { takes: { 0: { fee: { message: 'Should be a number' } } } },
-        );
-      });
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 'test', // <--
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          expect(<any>zValidationsMock.validate(testData)).to.eql(
+            { takes: { 0: { fee: { message: 'Should be a number' } } } },
+          );
+        });
 
-      it(`WHEN: fee value in entries less than minimum value
+        it(`WHEN: fee value in entries less than minimum value
             THEN: should return validation error`, () => {
-        const testData = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          stops: [
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: -1, // <--
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
             {
-              price: 90,
-              volumePart: 1,
-              fee: 0.002,
+              takes: { 0: { fee: { message: 'Value should be more then -1.', actual: -1 } } },
             },
-          ],
-          takes: [
-            {
-              price: 150,
-              volumePart: 1,
-              fee: -1, // <--
-            },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        expect(zValidationsMock.validate(testData)).to.eql(
-          {
-            takes: { 0: { fee: { message: 'Value should be more then -1.', actual: -1 } } },
-          },
-        );
-      });
+          );
+        });
 
-      it(`WHEN: fee value in entries more than maximum value
+        it(`WHEN: fee value in entries more than maximum value
             THEN: should return validation error`, () => {
-        const testData = {
-          deposit: 100,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
+          const testData = {
+            deposit: 100,
+            risk: 0.01,
+            leverage: {
+              allow: true,
+              max: 5,
+            },
+            tradeType: ETradeType.Long,
+            breakeven: {
               fee: 0.001,
             },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
-              fee: 0.002,
-            },
-          ],
-          takes: [
-            {
-              price: 150,
-              volumePart: 1,
-              fee: 2, // <--
-            },
-          ],
-          maxTradeVolumeQuoted: 100,
-        };
-        expect(zValidationsMock.validate(testData)).to.eql(
-          { takes: { 0: { fee: { message: 'Value should be less then 2.', actual: 2 } } } },
-        );
-      });
-
-      it(`WHEN: sum of volumePart more then 1
-            THEN: should return validation error`, () => {
-        const testData = {
-          deposit: 1000,
-          risk: 0.01,
-          leverage: {
-            allow: true,
-            max: 5,
-          },
-          tradeType: ETradeType.Long,
-          breakeven: {
-            fee: 0.001,
-          },
-          entries: [
-            {
-              price: 100,
-              volumePart: 1,
-              fee: 0.002,
-            },
-          ],
-          stops: [
-            {
-              price: 90,
-              volumePart: 1,
-              fee: 0.001,
-            },
-          ],
-          takes: [
-            {
-              price: 150,
-              volumePart: 1, // <--
-              fee: 0.002,
-            },
-            {
-              price: 150,
-              volumePart: 1, // <--
-              fee: 0.002,
-            },
-          ],
-          maxTradeVolumeQuoted: 5000,
-        };
-        expect(zValidationsMock.validate(testData)).to.eql(
-          { takes: { 0: { entity: { message: 'Sum of volume parts should be no more than \'1\'', actual: 2 } } } },
-        );
+            entries: [
+              {
+                price: 100,
+                volumePart: 1,
+                fee: 0.001,
+              },
+            ],
+            stops: [
+              {
+                price: 90,
+                volumePart: 1,
+                fee: 0.002,
+              },
+            ],
+            takes: [
+              {
+                price: 150,
+                volumePart: 1,
+                fee: 2, // <--
+              },
+            ],
+            maxTradeVolumeQuoted: 100,
+          };
+          expect(zValidationsMock.validate(testData)).to.eql(
+            { takes: { 0: { fee: { message: 'Value should be less then 2.', actual: 2 } } } },
+          );
+        });
       });
 
       it(`WHEN: tradeType === 'long' and takes price less then entries price
